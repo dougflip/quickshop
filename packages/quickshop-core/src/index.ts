@@ -63,8 +63,11 @@ const departments: Department[] = [
   { label: "Cheese/Dips" },
   { label: "Cereal" },
   { label: "Tacos" },
+  { label: "Pasta" },
+  { label: "Indian" },
   { label: "Dairy" },
   { label: "Meats" },
+  { label: "Fish" },
   { label: "Frozen" },
 ];
 
@@ -73,17 +76,26 @@ export const items: Item[] = [
   { label: "Apples", department: 'Produce' },
   { label: "Grapes", department: 'Produce' },
   { label: "Strawberries", department: 'Produce' },
+  { label: "Blueberries", department: 'Produce' },
   { label: "Lettuce", department: 'Produce' },
   { label: "Mixed Greens", department: 'Produce' },
   { label: "Cucumbers", department: 'Produce' },
   { label: "Peppers", department: 'Produce' },
   { label: "Carrots", department: 'Produce' },
-  { label: "Blueberries", department: 'Produce' },
+  { label: "Sweet Potatoes", department: 'Produce' },
+  { label: "Brussel Sprouts", department: 'Produce' },
+  { label: "Asparagus", department: 'Produce' },
+  { label: "Cauliflower", department: 'Produce' },
+  { label: "Green Beans", department: 'Produce' },
 
   // Bread
   { label: "Round Sourdough", department: 'Bread' },
   { label: "Hawaiin Rolls", department: 'Bread' },
   { label: "Wheat Bread", department: 'Bread' },
+  { label: 'Brioche Hamburger Buns', department: 'Bread' },
+  { label: 'Bagels Plain', department: 'Bread' },
+  { label: 'Bagels Blueberry', department: 'Bread' },
+  { label: 'English Muffins', department: 'Bread' },
 
   // Chips
   { label: "Plain Chips", department: 'Chips' },
@@ -91,16 +103,30 @@ export const items: Item[] = [
   { label: "Ruffle Chips", department: 'Chips' },
 
   // Cheese/Dips
-  { label: "Sharp Cheddar Block", department: 'Cheese/Dips' },
+  { label: "Cheddar Block Sharp", department: 'Cheese/Dips' },
+  { label: "Cheddar Block Mild", department: 'Cheese/Dips' },
+  { label: "Havarti Block", department: 'Cheese/Dips' },
+  { label: "Sliced Colby Jack", department: 'Cheese/Dips' },
+  { label: "Sliced Havarti", department: 'Cheese/Dips' },
+  { label: "Sliced Cheddar", department: 'Cheese/Dips' },
   { label: "Shredded Mozzarella", department: 'Cheese/Dips' },
   { label: "Blue Cheese", department: 'Cheese/Dips' },
 
   // Cereal
   { label: "Cheerios", department: 'Cereal' },
 
+  // Pasta
+  { label: "Shells", department: "Pasta" },
+  { label: "Spaghetti", department: "Pasta" },
+  { label: "Fettuccine", department: "Pasta" },
+  { label: "4 Cheese Sauce", department: "Pasta" },
+
   // Tacos
   { label: "Soft Taco Shells Small", department: 'Tacos' },
   { label: "Soft Taco Shells Large", department: 'Tacos' },
+
+  // Indian
+  { label: "Tikka Masala Sauce", department: 'Indian' },
 
   // Dairy
   { label: "2% Milk", department: 'Dairy' },
@@ -108,9 +134,15 @@ export const items: Item[] = [
   { label: "Salted Butter", department: 'Dairy' },
   { label: "Unsalted Butter", department: 'Dairy' },
   { label: "Eggs", department: 'Dairy' },
+  { label: "Cream Cheese", department: 'Dairy' },
+
+  // Fish
+  { label: "Tilapia", department: 'Fish' },
+  { label: "Salmon", department: 'Fish' },
 
   // Meats
   { label: "Chicken", department: 'Meats' },
+  { label: "Steak", department: 'Meats' },
   { label: "Bacon", department: 'Meats' },
   { label: "Sausage Cylinders", department: 'Meats' },
 ];
