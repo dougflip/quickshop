@@ -1,3 +1,5 @@
+import * as R from 'remeda';
+
 export type Id = unknown;
 
 export type Department = {
@@ -6,8 +8,13 @@ export type Department = {
 
 export type Item = {
   label: string;
-  departmentId: Id;
+  department: string;
 };
+
+export type ItemsByDepartment = {
+    departmentName: string;
+    items: Item[];
+}
 
 export type Store = {
   label: string;
@@ -39,6 +46,11 @@ export function moveItem(
   return [fromList.filter((x) => x.label !== item.label), [...toList, item]];
 }
 
+export function groupByDepartment(list: Item[]): ItemsByDepartment[] {
+    const grouped = R.groupBy(list, x => x.department);
+    return Object.entries(grouped).map(([k, v]) => ({ departmentName: k, items: v }))
+}
+
 // ====================
 // These will probably go to some kind of database? eventually?
 // For now, the web will stuff these in local storage
@@ -58,47 +70,47 @@ const departments: Department[] = [
 
 export const items: Item[] = [
   // Produce (includes fruits)
-  { label: "Apples", departmentId: 1 },
-  { label: "Grapes", departmentId: 1 },
-  { label: "Strawberries", departmentId: 1 },
-  { label: "Lettuce", departmentId: 1 },
-  { label: "Mixed Greens", departmentId: 1 },
-  { label: "Cucumbers", departmentId: 1 },
-  { label: "Peppers", departmentId: 1 },
-  { label: "Carrots", departmentId: 1 },
-  { label: "Blueberries", departmentId: 1 },
+  { label: "Apples", department: 'Produce' },
+  { label: "Grapes", department: 'Produce' },
+  { label: "Strawberries", department: 'Produce' },
+  { label: "Lettuce", department: 'Produce' },
+  { label: "Mixed Greens", department: 'Produce' },
+  { label: "Cucumbers", department: 'Produce' },
+  { label: "Peppers", department: 'Produce' },
+  { label: "Carrots", department: 'Produce' },
+  { label: "Blueberries", department: 'Produce' },
 
   // Bread
-  { label: "Round Sourdough", departmentId: 2 },
-  { label: "Hawaiin Rolls", departmentId: 2 },
-  { label: "Wheat Bread", departmentId: 2 },
+  { label: "Round Sourdough", department: 'Bread' },
+  { label: "Hawaiin Rolls", department: 'Bread' },
+  { label: "Wheat Bread", department: 'Bread' },
 
   // Chips
-  { label: "Plain Chips", departmentId: 3 },
-  { label: "Tortilla Chips", departmentId: 3 },
-  { label: "Ruffle Chips", departmentId: 3 },
+  { label: "Plain Chips", department: 'Chips' },
+  { label: "Tortilla Chips", department: 'Chips' },
+  { label: "Ruffle Chips", department: 'Chips' },
 
   // Cheese/Dips
-  { label: "Sharp Cheddar Block", departmentId: 4 },
-  { label: "Shredded Mozzarella", departmentId: 4 },
-  { label: "Blue Cheese", departmentId: 4 },
+  { label: "Sharp Cheddar Block", department: 'Cheese/Dips' },
+  { label: "Shredded Mozzarella", department: 'Cheese/Dips' },
+  { label: "Blue Cheese", department: 'Cheese/Dips' },
 
   // Cereal
-  { label: "Cheerios", departmentId: 5 },
+  { label: "Cheerios", department: 'Cereal' },
 
   // Tacos
-  { label: "Soft Taco Shells Small", departmentId: 6 },
-  { label: "Soft Taco Shells Large", departmentId: 6 },
+  { label: "Soft Taco Shells Small", department: 'Tacos' },
+  { label: "Soft Taco Shells Large", department: 'Tacos' },
 
   // Dairy
-  { label: "2% Milk", departmentId: 7 },
-  { label: "Greek Yogurt", departmentId: 7 },
-  { label: "Salted Butter", departmentId: 7 },
-  { label: "Unsalted Butter", departmentId: 7 },
-  { label: "Eggs", departmentId: 7 },
+  { label: "2% Milk", department: 'Dairy' },
+  { label: "Greek Yogurt", department: 'Dairy' },
+  { label: "Salted Butter", department: 'Dairy' },
+  { label: "Unsalted Butter", department: 'Dairy' },
+  { label: "Eggs", department: 'Dairy' },
 
   // Meats
-  { label: "Chicken", departmentId: 8 },
-  { label: "Bacon", departmentId: 8 },
-  { label: "Sausage Cylinders", departmentId: 8 },
+  { label: "Chicken", department: 'Meats' },
+  { label: "Bacon", department: 'Meats' },
+  { label: "Sausage Cylinders", department: 'Meats' },
 ];

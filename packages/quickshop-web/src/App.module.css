@@ -6,8 +6,10 @@
   }
 }
 
-.items {
-  display: flex;
-  flex-direction: column;
-  row-gap: 1rem;
+.department {
+  margin: 2rem 0;
+}
+
+.department-header {
+  margin: 0;
 }

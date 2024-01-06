@@ -1,4 +1,9 @@
-import { Item as ItemData, items, moveItem } from "@dougflip/quickshop-core";
+import {
+  Item as ItemData,
+  groupByDepartment,
+  items,
+  moveItem,
+} from "@dougflip/quickshop-core";
 
 import { Item } from "./components/item";
 import classNames from "classnames";
@@ -21,6 +26,10 @@ function App() {
     "shopping-list",
     []
   );
+  const [fadedItems, setFadedItems] = useLocalStorage<string[]>(
+    "faded-items",
+    []
+  );
 
   function fromAllToShop(x: ItemData) {
     const [newAll, newList] = moveItem(allItems, listItems, x);
@@ -32,6 +41,13 @@ function App() {
     const [newAll, newIgnore] = moveItem(allItems, ignoredItems, x);
     setAllItems(newAll);
     setIgnoredItems(newIgnore);
+  }
+
+  function resetState() {
+    setIgnoredItems([]);
+    setAllItems([...items])
+    setListItems([]);
+    setFadedItems([]);
   }
 
   return (
@@ -64,24 +80,55 @@ function App() {
       </nav>
       {mode === "ignored-items" && (
         <section>
-          {ignoredItems.map((x) => (
-            <Item label={x.label} />
+          {groupByDepartment(ignoredItems).map((x) => (
+            <div key={x.departmentName} className={classes.department}>
+              <h2 className={classes["department-header"]}>
+                {x.departmentName}
+              </h2>
+              {x.items.map((item) => (
+                <Item label={item.label} />
+              ))}
+            </div>
           ))}
         </section>
       )}
       {mode === "select-items" && (
-        <section className={classes.items}>
-          {allItems.map((x) => (
-            <Item
-              label={x.label}
-              onAdd={() => fromAllToShop(x)}
-              onDismiss={() => fromAllToIgnore(x)}
-            />
+        <section>
+          {groupByDepartment(allItems).map((x) => (
+            <div key={x.departmentName} className={classes.department}>
+              <h2 className={classes["department-header"]}>
+                {x.departmentName}
+              </h2>
+              {x.items.map((item) => (
+                <Item
+                  label={item.label}
+                  onAdd={() => fromAllToShop(item)}
+                  onDismiss={() => fromAllToIgnore(item)}
+                />
+              ))}
+            </div>
           ))}
         </section>
       )}
-      {mode === "review-items" &&
-        listItems.map((x) => <Item label={x.label} />)}
+      {mode === "review-items" && (
+        <section>
+          {groupByDepartment(listItems).map((x) => (
+            <div key={x.departmentName} className={classes.department}>
+              <h2 className={classes["department-header"]}>
+                {x.departmentName}
+              </h2>
+              {x.items.map((item) => (
+                <Item
+                  label={item.label}
+                  onAdd={() => setFadedItems(items => [...items, item.label])}
+                  itemState={fadedItems.some(f => f === item.label) ? 'faded' : 'normal'}
+                />
+              ))}
+            </div>
+          ))}
+        </section>
+      )}
+      <button onClick={resetState}>reset</button>
     </>
   );
 }
