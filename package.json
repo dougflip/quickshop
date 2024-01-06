@@ -5,7 +5,8 @@
   "main": "index.js",
   "workspaces": ["packages/*"],
   "scripts": {
-    "start": "npm run dev -w ./packages/quickshop-web"
+    "start": "npm run dev -w ./packages/quickshop-web",
+    "build": "npm run build -ws && cp -r packages/quickshop-web/dist/* docs/"
   },
   "keywords": [],
   "author": "",
