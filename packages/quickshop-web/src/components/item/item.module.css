@@ -1,0 +1,11 @@
+.item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.item-label {
+    width: 10rem;
+    font-size: larger;
+    text-align: center;
+}

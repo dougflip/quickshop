@@ -1,0 +1,13 @@
+.nav {
+  margin-bottom: 1rem;
+
+  .selected {
+    background-color: dodgerblue;
+  }
+}
+
+.items {
+  display: flex;
+  flex-direction: column;
+  row-gap: 1rem;
+}

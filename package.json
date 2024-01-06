@@ -1,0 +1,13 @@
+{
+  "name": "quickshop",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "workspaces": ["packages/*"],
+  "scripts": {
+    "start": "npm run dev -w ./packages/quickshop-web"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
