@@ -5,7 +5,6 @@ import {
   moveItem,
 } from "@dougflip/quickshop-core";
 
-import { Item } from "./components/item";
 import classNames from "classnames";
 import classes from "./App.module.css";
 import { useLocalStorage } from "usehooks-ts";
@@ -37,6 +36,7 @@ function App() {
     const [newList, newAll] = moveItem(listItems, allItems, x);
     setAllItems(newAll);
     setListItems(newList);
+    setFadedItems(fadedItems.filter((f) => f !== x.label));
   }
 
   function resetState() {
@@ -65,54 +65,63 @@ function App() {
           Shop
         </button>
       </nav>
-      {mode === "select-items" && (
-        <section>
-          {groupByDepartment(allItems).map((x) => (
-            <div key={x.departmentName} className={classes.department}>
-              <h2 className={classes["department-header"]}>
-                {x.departmentName}
-              </h2>
-              {x.items.map((item) => (
-                <div>
-                  <button
-                    className={classes["item-button"]}
-                    onClick={() => fromAllToShop(item)}
-                  >
-                    {item.label}
-                  </button>
-                </div>
-              ))}
-            </div>
-          ))}
-        </section>
-      )}
-      {mode === "shop-items" && (
-        <section>
-          {groupByDepartment(listItems).map((x) => (
-            <div key={x.departmentName} className={classes.department}>
-              <h2 className={classes["department-header"]}>
-                {x.departmentName}
-              </h2>
-              {x.items.map((item) => (
-                <Item
-                  label={item.label}
-                  leftText="⬅️"
-                  onLeft={() => fromShopToAll(item)}
-                  onRight={() =>
-                    setFadedItems((items) => [...items, item.label])
-                  }
-                  itemState={
-                    fadedItems.some((f) => f === item.label)
-                      ? "faded"
-                      : "normal"
-                  }
-                />
-              ))}
-            </div>
-          ))}
-        </section>
-      )}
-      <button onClick={resetState}>reset</button>
+      <main className={classes.main}>
+        {mode === "select-items" && (
+          <section>
+            {groupByDepartment(allItems).map((x) => (
+              <div key={x.departmentName} className={classes.department}>
+                <h2 className={classes["department-header"]}>
+                  {x.departmentName}
+                </h2>
+                {x.items.map((item) => (
+                  <div key={item.label}>
+                    <button
+                      className={classes["item-button"]}
+                      onClick={() => fromAllToShop(item)}
+                    >
+                      {item.label}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </section>
+        )}
+        {mode === "shop-items" && (
+          <section>
+            {groupByDepartment(listItems).map((x) => (
+              <div key={x.departmentName} className={classes.department}>
+                <h2 className={classes["department-header"]}>
+                  {x.departmentName}
+                </h2>
+                {x.items.map((item) => (
+                  <div>
+                    <button
+                      className={classNames(classes["item-button"], {
+                        [classes.faded]: fadedItems.some(
+                          (f) => f === item.label
+                        ),
+                      })}
+                      onClick={() =>
+                        setFadedItems((items) => [...items, item.label])
+                      }
+                    >
+                      {item.label}
+                    </button>
+                    <button
+                      className={classes["item-clear"]}
+                      onClick={() => fromShopToAll(item)}
+                    >
+                      ❌
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </section>
+        )}
+        <button onClick={resetState}>reset</button>
+      </main>
     </>
   );
 }

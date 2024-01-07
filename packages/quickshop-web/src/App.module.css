@@ -1,5 +1,12 @@
 .nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 1rem 0;
   margin-bottom: 1rem;
+  background-color: #242424;
+  z-index: 1;
 
   .selected {
     background-color: dodgerblue;
@@ -17,4 +24,13 @@
 
 .department-header {
   margin: 0;
+}
+
+.faded {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.item-clear {
+  margin-left: 0.75rem;;
 }
