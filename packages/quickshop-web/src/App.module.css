@@ -6,6 +6,11 @@
   }
 }
 
+.item-button {
+  width: 15rem;
+  margin-bottom: 0.5rem;
+}
+
 .department {
   margin: 2rem 0;
 }

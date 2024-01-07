@@ -11,14 +11,10 @@ import classes from "./App.module.css";
 import { useLocalStorage } from "usehooks-ts";
 import { useState } from "react";
 
-type Mode = "ignored-items" | "select-items" | "review-items";
+type Mode = "select-items" | "shop-items";
 
 function App() {
   const [mode, setMode] = useState<Mode>("select-items");
-  const [ignoredItems, setIgnoredItems] = useLocalStorage<ItemData[]>(
-    "ignored-items",
-    []
-  );
   const [allItems, setAllItems] = useLocalStorage<ItemData[]>("all-items", [
     ...items,
   ]);
@@ -37,15 +33,14 @@ function App() {
     setListItems(newList);
   }
 
-  function fromAllToIgnore(x: ItemData) {
-    const [newAll, newIgnore] = moveItem(allItems, ignoredItems, x);
+  function fromShopToAll(x: ItemData) {
+    const [newList, newAll] = moveItem(listItems, allItems, x);
     setAllItems(newAll);
-    setIgnoredItems(newIgnore);
+    setListItems(newList);
   }
 
   function resetState() {
-    setIgnoredItems([]);
-    setAllItems([...items])
+    setAllItems([...items]);
     setListItems([]);
     setFadedItems([]);
   }
@@ -55,43 +50,21 @@ function App() {
       <nav className={classes.nav}>
         <button
           className={classNames({
-            [classes.selected]: mode === "ignored-items",
-          })}
-          onClick={() => setMode("ignored-items")}
-        >
-          Ignored
-        </button>
-        <button
-          className={classNames({
             [classes.selected]: mode === "select-items",
           })}
           onClick={() => setMode("select-items")}
         >
-          Select Items
+          Items
         </button>
         <button
           className={classNames({
-            [classes.selected]: mode === "review-items",
+            [classes.selected]: mode === "shop-items",
           })}
-          onClick={() => setMode("review-items")}
+          onClick={() => setMode("shop-items")}
         >
           Shop
         </button>
       </nav>
-      {mode === "ignored-items" && (
-        <section>
-          {groupByDepartment(ignoredItems).map((x) => (
-            <div key={x.departmentName} className={classes.department}>
-              <h2 className={classes["department-header"]}>
-                {x.departmentName}
-              </h2>
-              {x.items.map((item) => (
-                <Item label={item.label} />
-              ))}
-            </div>
-          ))}
-        </section>
-      )}
       {mode === "select-items" && (
         <section>
           {groupByDepartment(allItems).map((x) => (
@@ -100,17 +73,20 @@ function App() {
                 {x.departmentName}
               </h2>
               {x.items.map((item) => (
-                <Item
-                  label={item.label}
-                  onAdd={() => fromAllToShop(item)}
-                  onDismiss={() => fromAllToIgnore(item)}
-                />
+                <div>
+                  <button
+                    className={classes["item-button"]}
+                    onClick={() => fromAllToShop(item)}
+                  >
+                    {item.label}
+                  </button>
+                </div>
               ))}
             </div>
           ))}
         </section>
       )}
-      {mode === "review-items" && (
+      {mode === "shop-items" && (
         <section>
           {groupByDepartment(listItems).map((x) => (
             <div key={x.departmentName} className={classes.department}>
@@ -120,8 +96,16 @@ function App() {
               {x.items.map((item) => (
                 <Item
                   label={item.label}
-                  onAdd={() => setFadedItems(items => [...items, item.label])}
-                  itemState={fadedItems.some(f => f === item.label) ? 'faded' : 'normal'}
+                  leftText="⬅️"
+                  onLeft={() => fromShopToAll(item)}
+                  onRight={() =>
+                    setFadedItems((items) => [...items, item.label])
+                  }
+                  itemState={
+                    fadedItems.some((f) => f === item.label)
+                      ? "faded"
+                      : "normal"
+                  }
                 />
               ))}
             </div>
