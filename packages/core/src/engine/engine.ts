@@ -18,14 +18,19 @@ import type {
   BackendError,
   BackendPort,
   Household,
+  HouseholdSnapshot,
   Member,
   Unsubscribe,
 } from "../ports/backend.ts";
-import type { Clock, IdGenerator } from "../ports/device.ts";
+import type { Clock, IdGenerator, LocalStore, NetworkStatus } from "../ports/device.ts";
+import { clearSaved, readSaved, worksOffline, writeSaved, type SavedHousehold } from "./offline.ts";
 
 export type EngineDeps = {
   readonly auth: AuthPort;
   readonly backend: BackendPort;
+  readonly network: NetworkStatus;
+  /** Keeps the household and unsent changes on the device, for opening and shopping offline. */
+  readonly store: LocalStore;
   readonly clock: Clock;
   readonly ids: IdGenerator;
 };
@@ -46,6 +51,8 @@ export type ReadyState = {
   readonly members: readonly Member[];
   /** What the screens show: the server's data plus this device's changes not yet confirmed. */
   readonly data: HouseholdData;
+  readonly online: boolean;
+  /** Changes made on this device that the server has not confirmed yet. */
   readonly pendingCount: number;
   /** The trip this device just completed, for the summary screen. */
   readonly lastTrip: CompletedTrip | null;
@@ -61,7 +68,9 @@ export type EngineState =
   | ReadyState;
 
 export type NotReady = { readonly kind: "notReady" };
-export type CommandError = DomainError | NotReady;
+/** Adding and editing need a connection; only shopping works offline. */
+export type Offline = { readonly kind: "offline" };
+export type CommandError = DomainError | NotReady | Offline;
 export type CommandResult<T = void> = Result<T, CommandError>;
 
 export type Engine = {
@@ -72,6 +81,7 @@ export type Engine = {
   /** Restores a saved session if there is one. Call once at launch. */
   start: () => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
+  /** Signs out and forgets this device's copy of the household, including unsent changes. */
   signOut: () => Promise<void>;
   /** Tries loading the household again after `loadFailed`. */
   retryLoad: () => Promise<void>;
@@ -101,7 +111,7 @@ export type Engine = {
   dismissTripSummary: () => void;
   dismissNotice: () => void;
 
-  /** Resolves once every change made so far has been sent. For tests and shutdown. */
+  /** Resolves once every change that can be sent has been, and the device copy is saved. */
   idle: () => Promise<void>;
   dispose: () => void;
 };
@@ -110,9 +120,9 @@ export type Engine = {
 type Live = {
   readonly user: SessionUser;
   readonly household: Household;
-  readonly members: readonly Member[];
+  members: readonly Member[];
   confirmed: HouseholdData;
-  pending: Mutation[];
+  pending: readonly Mutation[];
   lastTrip: CompletedTrip | null;
   notice: Notice | null;
   readonly unsubscribe: Unsubscribe;
@@ -120,17 +130,30 @@ type Live = {
 
 /**
  * The app's single source of truth. Screens read `getState()` and call commands; they hold no
- * logic of their own. Commands check the change locally, show it immediately, and send it to the
- * backend in order. A change the backend refuses is undone and reported as a notice.
+ * logic of their own.
+ *
+ * Commands are checked locally, shown at once, and sent to the backend in order. The screen shows
+ * the server's data with this device's unsent changes applied on top, so a change the server
+ * refuses simply drops out and is reported as a notice. Offline, shopping changes wait in a queue
+ * saved on the device and are sent when the connection returns.
  */
 export function createEngine(deps: EngineDeps): Engine {
-  const { auth, backend, clock, ids } = deps;
+  const { auth, backend, network, store, clock, ids } = deps;
   const listeners = new Set<() => void>();
   let state: EngineState = { kind: "starting" };
   let live: Live | null = null;
   /** Bumped on sign-in and sign-out so late async results from an old session are dropped. */
   let generation = 0;
   let sending: Promise<void> | null = null;
+  let sendAgain = false;
+  let reconnecting: Promise<void> | null = null;
+  let saving: Promise<void> = Promise.resolve();
+
+  const stopWatchingNetwork = network.subscribe((online) => {
+    if (live === null) return;
+    publish();
+    if (online) catchUp(live);
+  });
 
   function setState(next: EngineState) {
     state = next;
@@ -144,65 +167,132 @@ export function createEngine(deps: EngineDeps): Engine {
     }, l.confirmed);
   }
 
+  /** Shows the current household and saves the device copy. */
   function publish() {
     if (live === null) return;
+    const l = live;
     setState({
       kind: "ready",
-      user: live.user,
-      household: live.household,
-      members: live.members,
-      data: view(live),
-      pendingCount: live.pending.length,
-      lastTrip: live.lastTrip,
-      notice: live.notice,
+      user: l.user,
+      household: l.household,
+      members: l.members,
+      data: view(l),
+      online: network.isOnline(),
+      pendingCount: l.pending.length,
+      lastTrip: l.lastTrip,
+      notice: l.notice,
     });
+    const saved: SavedHousehold = {
+      version: 1,
+      household: l.household,
+      members: l.members,
+      confirmed: l.confirmed,
+      pending: l.pending,
+    };
+    saving = saving.then(() => writeSaved(store, l.user.id, saved));
   }
 
   async function enterSession(user: SessionUser) {
     const gen = ++generation;
     setState({ kind: "loading", user });
+    const saved = await readSaved(store, user.id);
+    if (gen !== generation) return;
+    if (!network.isOnline()) {
+      if (saved === null)
+        return setState({ kind: "loadFailed", user, error: { kind: "unavailable" } });
+      return goLive(user, saved, gen);
+    }
+
     const households = await backend.listHouseholds();
     if (gen !== generation) return;
-    if (!households.ok) return setState({ kind: "loadFailed", user, error: households.error });
+    if (!households.ok) {
+      if (households.error.kind === "unavailable" && saved !== null)
+        return goLive(user, saved, gen);
+      return setState({ kind: "loadFailed", user, error: households.error });
+    }
     const household = households.value[0];
     if (household === undefined) return setState({ kind: "noHousehold", user });
-    await loadHousehold(user, household.id, gen);
-  }
+    const pending = saved?.household.id === household.id ? saved.pending : [];
 
-  async function loadHousehold(user: SessionUser, householdId: HouseholdId, gen: number) {
     // Subscribe first and hold early changes, so nothing is missed between load and subscribe.
     const early: Change[] = [];
     let target: Live | null = null;
-    const unsubscribe = backend.subscribe(householdId, (change) => {
-      if (target === null) {
-        early.push(change);
-        return;
-      }
-      if (live !== target) return;
-      target.confirmed = applyChange(target.confirmed, change);
-      publish();
-    });
-    const snapshot = await backend.loadHousehold(householdId);
-    if (gen !== generation) {
-      unsubscribe();
-      return;
-    }
+    const unsubscribe = subscribeTo(household.id, () => target, early);
+    const snapshot = await backend.loadHousehold(household.id);
+    if (gen !== generation) return unsubscribe();
     if (!snapshot.ok) {
       unsubscribe();
-      setState({ kind: "loadFailed", user, error: snapshot.error });
-      return;
+      if (snapshot.error.kind === "unavailable" && saved !== null) return goLive(user, saved, gen);
+      return setState({ kind: "loadFailed", user, error: snapshot.error });
     }
     target = {
       user,
       household: snapshot.value.household,
       members: snapshot.value.members,
       confirmed: early.reduce(applyChange, snapshot.value.data),
-      pending: [],
+      pending,
       lastTrip: null,
       notice: null,
       unsubscribe,
     };
     live = target;
+    publish();
+    void send();
+  }
+
+  /** Opens the household from the device copy, then catches up if the network is there. */
+  function goLive(user: SessionUser, saved: SavedHousehold, gen: number) {
+    if (gen !== generation) return;
+    let target: Live | null = null;
+    const unsubscribe = subscribeTo(saved.household.id, () => target, []);
+    target = {
+      user,
+      household: saved.household,
+      members: saved.members,
+      confirmed: saved.confirmed,
+      pending: saved.pending,
+      lastTrip: null,
+      notice: null,
+      unsubscribe,
+    };
+    live = target;
+    publish();
+    if (network.isOnline()) catchUp(target);
+  }
+
+  function subscribeTo(
+    householdId: HouseholdId,
+    target: () => Live | null,
+    early: Change[],
+  ): Unsubscribe {
+    return backend.subscribe(householdId, (change) => {
+      const l = target();
+      if (l === null) {
+        early.push(change);
+        return;
+      }
+      if (live !== l) return;
+      l.confirmed = applyChange(l.confirmed, change);
+      publish();
+    });
+  }
+
+  function catchUp(l: Live) {
+    reconnecting ??= reconnect(l).finally(() => {
+      reconnecting = null;
+    });
+  }
+
+  /** Back online: send what waited, then reload to pick up anything missed while away. */
+  async function reconnect(l: Live) {
+    await send();
+    if (live !== l || !network.isOnline()) return;
+    const snapshot: Result<HouseholdSnapshot, BackendError> = await backend.loadHousehold(
+      l.household.id,
+    );
+    if (live !== l || !snapshot.ok) return;
+    l.confirmed = snapshot.value.data;
+    l.members = snapshot.value.members;
     publish();
   }
 
@@ -212,37 +302,57 @@ export function createEngine(deps: EngineDeps): Engine {
     live = null;
   }
 
-  /** Sends pending changes one at a time, oldest first. */
+  /**
+   * Sends pending changes one at a time, oldest first. Stops when offline; a shopping change that
+   * could not be delivered stays at the front of the queue for the next attempt. Asking again while
+   * a pass is running schedules another pass, so a reconnect at the tail of one is not missed.
+   */
   function send(): Promise<void> {
-    sending ??= (async () => {
-      // Changes must reach the backend in order, so each waits for the one before it.
-      // `live` and its queue change while awaiting, which the loop condition re-reads.
-      // oxlint-disable-next-line no-unmodified-loop-condition
-      while (live !== null && live.pending.length > 0) {
-        const current = live;
-        const [mutation] = current.pending;
-        if (mutation === undefined) break;
-        // oxlint-disable-next-line no-await-in-loop
-        const result = await backend.apply(current.household.id, mutation);
-        if (live !== current) break;
-        current.pending = current.pending.slice(1);
-        if (result.ok) {
-          const applied = applyMutation(current.confirmed, mutation, current.user.id);
-          if (applied.ok) current.confirmed = applied.value.data;
-        } else {
-          current.notice = toNotice(mutation, result.error);
-        }
-        publish();
-      }
+    if (sending !== null) {
+      sendAgain = true;
+      return sending;
+    }
+    sending = (async () => {
+      do {
+        sendAgain = false;
+        // oxlint-disable-next-line no-await-in-loop -- each pass must finish before the next
+        await drainQueue();
+        // send() can set it again while the pass above is awaiting.
+        // oxlint-disable-next-line typescript/no-unnecessary-condition
+      } while (sendAgain);
     })().finally(() => {
       sending = null;
     });
     return sending;
   }
 
+  async function drainQueue() {
+    // Changes must reach the backend in order, so each waits for the one before it.
+    // `live`, its queue and the network change while awaiting; the condition re-reads them.
+    // oxlint-disable-next-line no-unmodified-loop-condition
+    while (live !== null && live.pending.length > 0 && network.isOnline()) {
+      const current = live;
+      const [mutation] = current.pending;
+      if (mutation === undefined) break;
+      // oxlint-disable-next-line no-await-in-loop
+      const result = await backend.apply(current.household.id, mutation);
+      if (live !== current) break;
+      if (!result.ok && result.error.kind === "unavailable" && worksOffline(mutation)) break;
+      current.pending = current.pending.slice(1);
+      if (result.ok) {
+        const applied = applyMutation(current.confirmed, mutation, current.user.id);
+        if (applied.ok) current.confirmed = applied.value.data;
+      } else {
+        current.notice = toNotice(mutation, result.error);
+      }
+      publish();
+    }
+  }
+
   /**
    * Checks the mutations against what the screen shows, queues them and shows them at once.
-   * Nothing is queued if any of them is refused.
+   * Nothing is queued if any of them is refused, or if one needs a connection that is missing.
+   * Local mistakes are reported before the missing connection.
    */
   function commit<T>(
     build: (ctx: {
@@ -259,6 +369,9 @@ export function createEngine(deps: EngineDeps): Engine {
       const result = applyMutation(data, mutation, current.user.id);
       if (!result.ok) return result;
       data = result.value.data;
+    }
+    if (!network.isOnline() && !built.value.mutations.every(worksOffline)) {
+      return err({ kind: "offline" });
     }
     current.pending = [...current.pending, ...built.value.mutations];
     publish();
@@ -298,7 +411,10 @@ export function createEngine(deps: EngineDeps): Engine {
     },
 
     async signOut() {
+      const userId = live?.user.id ?? null;
       leaveSession();
+      if (userId !== null) saving = saving.then(() => clearSaved(store, userId));
+      await saving;
       await auth.signOut();
       setState({ kind: "signedOut", signingIn: false, error: null });
     },
@@ -406,13 +522,18 @@ export function createEngine(deps: EngineDeps): Engine {
     },
 
     async idle() {
-      // A new send can start while awaiting the previous one.
-      // oxlint-disable-next-line no-unmodified-loop-condition, no-await-in-loop
-      while (sending !== null) await sending;
+      // A new send or catch-up can start while awaiting another, and each publish queues a save.
+      // oxlint-disable-next-line no-unmodified-loop-condition
+      while (sending !== null || reconnecting !== null) {
+        // oxlint-disable-next-line no-await-in-loop
+        await Promise.all([sending, reconnecting]);
+      }
+      await saving;
     },
 
     dispose() {
       leaveSession();
+      stopWatchingNetwork();
       listeners.clear();
     },
   };

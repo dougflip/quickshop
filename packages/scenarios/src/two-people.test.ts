@@ -1,5 +1,3 @@
-import { createManualClock, createSequentialIds } from "@quickshop/adapter-memory";
-import { asInstant, createEngine } from "@quickshop/core";
 import { describe, expect, it } from "vitest";
 import { entryFor, household, itemNames, ready, sample, sampleItemId, signIn } from "./support.ts";
 
@@ -28,15 +26,8 @@ describe("signing in", () => {
     const { phone } = household();
     const doug = phone("doug");
     await signIn(doug, "doug");
-    doug.engine.dispose();
-
     // Same device, app relaunched: the connection still holds the session.
-    const relaunched = createEngine({
-      auth: doug.connection.auth,
-      backend: doug.connection.backend,
-      clock: createManualClock(asInstant(0)),
-      ids: createSequentialIds("relaunch"),
-    });
+    const relaunched = doug.relaunch().engine;
     await relaunched.start();
     expect(relaunched.getState().kind).toBe("ready");
   });
@@ -194,12 +185,12 @@ describe("refused changes", () => {
     expect(ready(doug).notice).toBeNull();
   });
 
-  it("undoes a change when the network is down (queued offline in M4)", async () => {
+  it("undoes an edit whose request fails before the device notices it is offline", async () => {
     const { phone, sync } = household();
     const doug = phone("doug");
     await signIn(doug, "doug");
 
-    doug.connection.setOnline(false);
+    doug.connection.setServerReachable(false);
     doug.engine.removeFromList(entryFor(ready(doug).data, "Milk").id);
     expect(itemNames(ready(doug).data)).not.toContain("Milk");
 

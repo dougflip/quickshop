@@ -10,3 +10,4 @@ export * from "./domain/trip.ts";
 export * from "./domain/mutation.ts";
 export type * from "./ports/index.ts";
 export * from "./engine/engine.ts";
+export { worksOffline } from "./engine/offline.ts";

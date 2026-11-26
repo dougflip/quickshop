@@ -1,5 +1,6 @@
 import {
   createManualClock,
+  createMemoryLocalStore,
   createMemoryServer,
   createSampleSeed,
   createSequentialIds,
@@ -24,6 +25,10 @@ export type Person = "doug" | "alex";
 export type Phone = {
   readonly engine: Engine;
   readonly connection: MemoryConnection;
+  /** The phone's own storage; it outlives the engine, like a real device across app launches. */
+  readonly store: ReturnType<typeof createMemoryLocalStore>;
+  /** Closes the app and opens it again on the same device. */
+  relaunch: () => Phone;
 };
 
 /** One shared server with the sample household, and a phone per person. */
@@ -35,16 +40,32 @@ export function household(): {
 } {
   const server = createMemoryServer(createSampleSeed());
   const clock = createManualClock(asInstant(Date.UTC(2026, 10, 26, 10, 0)));
-  const phone = (person: Person): Phone => {
-    const connection = server.connect();
+  const launch = (
+    person: Person,
+    connection: MemoryConnection,
+    store: ReturnType<typeof createMemoryLocalStore>,
+    launchCount: number,
+  ): Phone => {
     const engine = createEngine({
       auth: connection.auth,
       backend: connection.backend,
+      network: connection.network,
+      store,
       clock: { now: () => clock.advance(1000) },
-      ids: createSequentialIds(person),
+      ids: createSequentialIds(`${person}-${String(launchCount)}`),
     });
-    return { engine, connection };
+    return {
+      engine,
+      connection,
+      store,
+      relaunch: () => {
+        engine.dispose();
+        return launch(person, connection, store, launchCount + 1);
+      },
+    };
   };
+  const phone = (person: Person): Phone =>
+    launch(person, server.connect(), createMemoryLocalStore(), 1);
   const sync = async (...phones: Phone[]) => {
     await Promise.all(phones.map((p) => p.engine.idle()));
     await server.settle();

@@ -67,12 +67,14 @@ Dependency rule, checked by lint: `core` imports nothing from the other packages
 
 **Done when:** a headless scenario test, with two engines on one in-memory backend, has Doug add Milk and Alex's state show it, then has Alex start a trip and Doug's state show "Alex is shopping".
 
-## M4: Offline queue
+## M4: Offline queue ✅
 
-- `PendingOp` union (`startTrip | setEntryStatus | completeTrip`), saved through `LocalStore` and replayed in order on reconnect.
-- Ops set values, the newest `at` wins, and ops for rows that no longer exist are dropped.
-- While offline, adding and editing commands are refused with a typed `offline` error. Trip commands are queued.
-- The state shows how many changes are waiting.
+- Shopping changes (`startTrip`, `setEntryStatus`, `completeTrip`) work offline. Everything else is refused with a typed `offline` error, after any local mistake is reported.
+- The engine keeps a device copy (`LocalStore`): the household as last confirmed plus the queue of unsent changes. The app opens from it when offline, and the queue survives a reload.
+- On reconnect the queue is sent in order, then the household reloads to pick up anything missed. A shopping change that fails mid-request (the phone thinks it is online but the server can't be reached) stays queued and is retried on the next change or reconnect. There is no retry timer yet.
+- Ops set values, the newest `at` wins, and ops for rows that no longer exist are ignored, so replaying a queue is safe.
+- `ready` state shows `online` and `pendingCount`, for the "Offline · 3 changes waiting to sync" banner.
+- Signing out forgets the device copy, including unsent changes.
 
 **Done when** scenario tests cover:
 

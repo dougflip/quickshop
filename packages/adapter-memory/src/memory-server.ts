@@ -40,6 +40,11 @@ export type MemoryConnection = {
   readonly backend: BackendPort;
   readonly network: NetworkStatus;
   setOnline(online: boolean): void;
+  /**
+   * Requests fail as `unavailable` while the device still believes it is online, like captive
+   * Wi-Fi or a dead spot in a store.
+   */
+  setServerReachable(reachable: boolean): void;
 };
 
 export type MemoryServer = {
@@ -56,7 +61,7 @@ type Subscriber = {
   readonly onChange: (change: Change) => void;
 };
 
-type ConnectionState = { session: Session | null; online: boolean };
+type ConnectionState = { session: Session | null; online: boolean; reachable: boolean };
 
 /**
  * A backend held in memory that several connections share, so tests and the harness can act as
@@ -100,7 +105,7 @@ export function createMemoryServer(seed: MemorySeed): MemoryServer {
   }
 
   function connect(): MemoryConnection {
-    const state: ConnectionState = { session: null, online: true };
+    const state: ConnectionState = { session: null, online: true, reachable: true };
     const networkListeners = new Set<(online: boolean) => void>();
 
     /** Every backend call goes through here: network first, then who is asking. */
@@ -108,7 +113,7 @@ export function createMemoryServer(seed: MemorySeed): MemoryServer {
       householdId: HouseholdId | null,
       run: (userId: UserId) => Result<T, BackendError>,
     ): Promise<Result<T, BackendError>> {
-      if (!state.online) return Promise.resolve(err({ kind: "unavailable" }));
+      if (!state.online || !state.reachable) return Promise.resolve(err({ kind: "unavailable" }));
       const userId = state.session?.user.id;
       if (userId === undefined) return Promise.resolve(err({ kind: "unauthorized" }));
       if (householdId !== null && !isMember(state, householdId)) {
@@ -120,7 +125,9 @@ export function createMemoryServer(seed: MemorySeed): MemoryServer {
     const auth: AuthPort = {
       currentSession: () => Promise.resolve(state.session),
       signIn: (email, password) => {
-        if (!state.online) return Promise.resolve(err({ kind: "unavailable" }));
+        if (!state.online || !state.reachable) {
+          return Promise.resolve(err({ kind: "unavailable" }));
+        }
         const user = [...users.values()].find((u) => u.email === email && u.password === password);
         if (user === undefined) return Promise.resolve(err({ kind: "invalidCredentials" }));
         state.session = { user: { id: user.id, displayName: user.displayName } };
@@ -187,6 +194,9 @@ export function createMemoryServer(seed: MemorySeed): MemoryServer {
         if (state.online === online) return;
         state.online = online;
         for (const listener of networkListeners) listener(online);
+      },
+      setServerReachable: (reachable) => {
+        state.reachable = reachable;
       },
     };
   }
