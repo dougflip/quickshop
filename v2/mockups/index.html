@@ -1,0 +1,369 @@
+<title>QuickShop mockup</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE everyday: a household tool used one-handed in a store aisle
+   IDEA a shipped phone app; on desktop it sits in a device frame beside the mockup controls
+   PICTURE the working app itself, mid-use with a realistic list
+   COLOUR white ground, near-black ink, produce green leads, tomato red accent for counts and warnings
+   TYPE Figtree throughout, weight contrast for hierarchy
+   LAYOUT laptop: phone frame + controls panel side by side; phone: the app fills the screen, controls behind a pill */
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#0f1411);--ink:light-dark(#121614,#eef2ef);--muted:light-dark(#5b645f,#9aa59f);--line:light-dark(#e2e7e3,#25302a);--soft:light-dark(#f2f6f3,#18211c);--green:light-dark(#17803d,#3fbf6a);--on-green:light-dark(#ffffff,#05200e);--tomato:light-dark(#d93d25,#ff6f55);--stage:light-dark(#e6ede7,#070a08);--frame:light-dark(#121614,#2a332e)}
+:root[data-theme=light]{color-scheme:light}
+:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html,body{height:100%}
+body{margin:0;background:var(--stage);color:var(--ink);font:16px/1.45 Figtree,system-ui,sans-serif;overflow:hidden}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+button:disabled{cursor:not-allowed;opacity:.45}
+.stage{height:100%;display:grid}
+#app{position:relative;display:flex;flex-direction:column;background:var(--bg);height:100%;width:100%;overflow:hidden}
+@media(min-width:900px){.stage{grid-template-columns:400px 340px;justify-content:center;align-items:center;gap:48px;padding:24px}#app{height:min(860px,calc(100svh - 48px));border:10px solid var(--frame);border-radius:44px}.fab{display:none}}
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:calc(env(safe-area-inset-top,0px) + 20px) 20px 12px}
+.top h1{font-size:30px;line-height:1.05;letter-spacing:-.02em;font-weight:800;margin:0}
+.sub{margin:0 0 4px;color:var(--muted);font-size:14px;font-weight:500}
+.scroll{flex:1;overflow-y:auto;padding:0 20px 24px;position:relative}
+.grp h3{display:flex;justify-content:space-between;font-size:14px;font-weight:700;color:var(--muted);margin:20px 0 2px}
+ul{list-style:none;margin:0;padding:0}
+.row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.main{flex:1;display:flex;flex-direction:column;align-items:flex-start;text-align:left;background:none;border:0;padding:0}
+.nm{font-weight:600;font-size:17px}
+.note{background:none;border:0;padding:0;color:var(--muted);font-size:14px;text-align:left}
+.by{width:26px;height:26px;border-radius:50%;background:var(--soft);display:grid;place-items:center;font-size:13px;font-weight:700;color:var(--muted)}
+.icon{width:40px;height:40px;border-radius:12px;border:0;background:none;display:grid;place-items:center;color:var(--muted)}
+.icon:hover{background:var(--soft)}
+.fresh{animation:flash 1.4s ease-out}
+@keyframes flash{from{background:color-mix(in srgb,var(--green) 22%,transparent)}to{background:transparent}}
+@media(prefers-reduced-motion:reduce){.fresh{animation:none}}
+.addbox{position:relative;padding:0 20px 4px}
+.field{width:100%;height:50px;border:1.5px solid var(--line);border-radius:14px;padding:0 16px;background:var(--soft);font-size:16px}
+.field:focus{outline:2px solid var(--green);outline-offset:1px;background:var(--bg)}
+.sugg{position:absolute;left:20px;right:20px;top:54px;z-index:5;background:var(--bg);border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 24px rgb(0 0 0/.12);overflow:hidden}
+.sugg button{width:100%;display:flex;justify-content:space-between;gap:12px;padding:13px 16px;border:0;border-bottom:1px solid var(--line);background:none;text-align:left}
+.sugg button:hover{background:var(--soft)}
+.sugg small{color:var(--muted);font-size:13px}
+.hint{color:var(--muted);font-size:14px;margin:8px 0 0}
+.dock{padding:12px 20px;border-top:1px solid var(--line);background:var(--bg)}
+.primary{width:100%;height:54px;border:0;border-radius:16px;background:var(--green);color:var(--on-green);font-size:17px;font-weight:700}
+.ghost{height:40px;padding:0 14px;border-radius:12px;border:1.5px solid var(--line);background:none;font-weight:600;font-size:15px}
+.danger{color:var(--tomato)}
+.tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);background:var(--bg)}
+.tabs button{border:0;background:none;padding:9px 0 8px;display:grid;justify-items:center;gap:2px;font-size:13px;font-weight:600;color:var(--muted)}
+.tabs button.on{color:var(--green)}
+.tabs svg{width:24px;height:24px}
+.banner{display:flex;justify-content:space-between;align-items:center;gap:12px;width:calc(100% - 40px);margin:4px 20px 8px;padding:12px 14px;border:0;border-radius:14px;background:var(--green);color:var(--on-green);font-size:15px;text-align:left}
+.banner b{font-weight:700}
+.offline{background:var(--ink);color:var(--bg);font-size:14px;font-weight:600;padding:calc(env(safe-area-inset-top,0px) + 8px) 20px 8px}
+.offline+.top{padding-top:14px}
+.progress{height:8px;margin:0 20px 4px;background:var(--soft);border-radius:99px;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--green);border-radius:99px;transition:width .3s}
+.shoprow{width:100%;display:flex;align-items:center;gap:14px;min-height:60px;padding:10px 0;border:0;border-bottom:1px solid var(--line);background:none;text-align:left}
+.ck{flex:none;width:30px;height:30px;border-radius:50%;border:2.5px solid var(--line);display:grid;place-items:center}
+.shoprow.on .ck{background:var(--green);border-color:var(--green);color:var(--on-green)}
+.shoprow.on .nm{text-decoration:line-through;color:var(--muted);font-weight:500}
+.shoprow .sn{display:block;color:var(--muted);font-size:14px}
+.cart h3{color:var(--green)}
+.done .nm{text-decoration:line-through;color:var(--muted)}
+.pill{flex:none;height:36px;padding:0 14px;border-radius:99px;border:1.5px solid var(--green);background:none;color:var(--green);font-weight:700;font-size:14px}
+.pill.on{background:var(--green);color:var(--on-green)}
+.tags{color:var(--muted);font-size:14px}
+.empty{padding:40px 8px;text-align:center;color:var(--muted)}
+.empty b{display:block;color:var(--ink);font-size:18px;margin-bottom:4px}
+.scrim{position:absolute;inset:0;background:rgb(0 0 0/.38);z-index:10}
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:11;background:var(--bg);border-radius:22px 22px 0 0;padding:22px 20px calc(20px + env(safe-area-inset-bottom,0px));max-height:88%;overflow:auto;display:grid;gap:14px}
+.sheet h2{margin:0;font-size:22px;letter-spacing:-.01em}
+.sheet p{margin:0;color:var(--muted)}
+.sheet label,.lab{font-weight:600;font-size:15px;margin:0 0 -8px;color:var(--ink)}
+.sheet .lab small{display:block;font-weight:400;color:var(--muted);font-size:13px}
+textarea.field{height:90px;padding:12px 16px;resize:none}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);border-radius:99px;padding:8px 14px;background:none;font-size:15px;font-weight:600}
+.chip.on{background:var(--green);border-color:var(--green);color:var(--on-green)}
+.chip i{font-style:normal;opacity:.75;margin-right:4px}
+.acts{display:grid;gap:8px}
+.toast{position:absolute;z-index:20;left:50%;top:calc(env(safe-area-inset-top,0px) + 12px);transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:99px;font-size:14px;font-weight:600;white-space:nowrap;box-shadow:0 6px 20px rgb(0 0 0/.2)}
+.hero{background:var(--green);color:var(--on-green);padding:calc(env(safe-area-inset-top,0px) + 28px) 20px 24px;display:grid;justify-items:start;gap:6px}
+.hero h1{margin:0;font-size:40px;line-height:1.05;letter-spacing:-.02em;font-weight:800}
+.hero p{margin:0;font-size:17px;opacity:.9}
+.hero svg{width:100%;max-height:190px}
+.form{display:grid;gap:14px;padding:24px 20px}
+.form label{font-weight:600;font-size:15px;margin-bottom:-8px}
+.sec{margin:24px 0 4px;font-size:18px}
+.sec+p{margin:0 0 6px;color:var(--muted);font-size:14px}
+.av{width:38px;height:38px;border-radius:50%;background:var(--green);color:var(--on-green);display:grid;place-items:center;font-weight:700}
+#panel{background:var(--bg);border-radius:24px;padding:24px;max-height:calc(100svh - 48px);overflow:auto}
+#panel h2{margin:0;font-size:22px;letter-spacing:-.01em}
+#panel p{color:var(--muted);font-size:15px}
+#panel h3{font-size:16px;margin:22px 0 6px}
+#panel ol{padding-left:20px;margin:0;font-size:15px;display:grid;gap:8px}
+.ph{display:flex;justify-content:space-between;align-items:center}
+.ph .icon{display:none}
+.simbtns{display:grid;gap:8px}
+.simbtns button{height:44px;border-radius:12px;border:1.5px solid var(--line);background:var(--soft);font-weight:600;text-align:left;padding:0 14px}
+.simbtns button:hover:not(:disabled){border-color:var(--green)}
+.small{font-size:13px!important}
+.fab{position:fixed;z-index:30;right:max(12px,env(safe-area-inset-right,0px));bottom:calc(env(safe-area-inset-bottom,0px) + 150px);height:40px;padding:0 14px;border-radius:99px;border:0;background:var(--ink);color:var(--bg);font-weight:700;font-size:14px;box-shadow:0 6px 18px rgb(0 0 0/.25)}
+@media(max-width:899px){#panel{display:none;position:fixed;z-index:40;inset:auto 0 0 0;max-height:80%;border-radius:22px 22px 0 0;padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 40px rgb(0 0 0/.3)}#panel.open{display:block}.ph .icon{display:grid}}
+</style>
+
+<div class="stage">
+  <div id="app"></div>
+  <aside id="panel"></aside>
+</div>
+<button class="fab" data-act="panel">Mockup</button>
+
+<script>
+{
+const $ = s => document.querySelector(s);
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const USERS = {doug:{name:'Doug',email:'doug@example.com'}, alex:{name:'Alex',email:'alex@example.com'}};
+const DAY = 864e5, MIN = 6e4, KEY = 'quickshop-mockup-v1';
+let seq = 0;
+const nid = p => p + Date.now().toString(36) + (++seq);
+
+function seed(){
+  const categories = ['Produce','Bakery','Dairy','Meat & fish','Pantry','Frozen','Household'].map((name,i) => ({id:'c'+i, name}));
+  const raw = [['Bananas',[0]],['Apples',[0]],['Spinach',[0]],['Avocados',[0]],['Onions',[0]],['Sourdough bread',[1]],['Bagels',[1,5]],['Milk',[2]],['Greek yogurt',[2]],['Cheddar',[2]],['Eggs',[2]],['Butter',[2]],['Chicken thighs',[3]],['Salmon',[3,5]],['Ground beef',[3]],['Pasta',[4]],['Rice',[4]],['Peanut butter',[4]],['Coffee',[4]],['Olive oil',[4]],['Frozen peas',[5]],['Ice cream',[5]],['Paper towels',[6]],['Dish soap',[6]],['Trash bags',[6]]];
+  const items = raw.map(([name,cs],i) => ({id:'i'+i, name, cats:cs.map(c => 'c'+c)}));
+  const find = n => items.find(i => i.name === n).id;
+  const entries = [['Bananas','','alex'],['Spinach','','doug'],['Sourdough bread','','alex'],['Milk','2 gallons','doug'],['Eggs','','doug'],['Chicken thighs','family pack','alex'],['Coffee','the good kind','doug'],['Ice cream','','alex'],['Paper towels','','doug']]
+    .map(([n,note,by],k) => ({id:'e'+k, itemId:find(n), note, status:'needed', by}));
+  const now = Date.now();
+  const trips = [
+    {id:'t2', by:'alex', start:now-7*DAY-38*MIN, end:now-7*DAY, bought:['Bananas','Milk','Eggs','Greek yogurt','Pasta','Salmon','Spinach','Butter','Coffee','Dish soap','Apples'], left:['Avocados']},
+    {id:'t1', by:'doug', start:now-14*DAY-52*MIN, end:now-14*DAY, bought:['Milk','Eggs','Bagels','Cheddar','Chicken thighs','Ground beef','Rice','Onions','Olive oil','Frozen peas','Ice cream','Paper towels','Trash bags','Peanut butter'], left:[]}
+  ];
+  return {user:null, view:'list', trip:null, summary:null, online:true, pending:0, q:'', cq:'', newCat:'', sheet:null, toast:'', panel:false, categories, items, entries, trips};
+}
+function load(){ try { const d = JSON.parse(localStorage.getItem(KEY)); if (d && d.items) return d; } catch(_){} return seed(); }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify({...S, sheet:null, toast:'', panel:false})); } catch(_){} }
+let S = seed();
+
+const item = id => S.items.find(i => i.id === id);
+const catName = id => (S.categories.find(c => c.id === id) || {name:'Other'}).name;
+const onList = itemId => S.entries.some(e => e.itemId === itemId);
+const other = () => S.user === 'alex' ? 'doug' : 'alex';
+const nm = u => USERS[u].name;
+const plural = (n,w) => n + ' ' + w + (n === 1 ? '' : 's');
+const time = t => new Date(t).toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
+const date = t => new Date(t).toLocaleDateString([], {weekday:'short', month:'short', day:'numeric'});
+const mins = (a,b) => Math.max(1, Math.round((b-a)/MIN));
+const off = () => S.online ? '' : 'disabled';
+
+function addEntry(itemId, by){
+  if (onList(itemId)) return;
+  S.entries.push({id:nid('e'), itemId, note:'', status:'needed', by, fresh:true});
+  setTimeout(() => S.entries.forEach(e => delete e.fresh), 1500);
+}
+function toast(t){ S.toast = t; render(); clearTimeout(toast.h); toast.h = setTimeout(() => { S.toast = ''; render(); }, 2600); }
+
+function groups(entries){
+  const valid = new Set(S.categories.map(c => c.id)), g = {};
+  entries.forEach(e => { const c = item(e.itemId).cats.find(x => valid.has(x)) || 'none'; (g[c] = g[c] || []).push(e); });
+  return [...S.categories.map(c => c.id), 'none'].filter(k => g[k]).map(k => ({id:k, name:catName(k), entries:g[k].sort((a,b) => item(a.itemId).name.localeCompare(item(b.itemId).name))}));
+}
+
+const ICONS = {
+  list:'<path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/>',
+  catalog:'<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
+  x:'<path d="M6 6l12 12M18 6 6 18"/>', check:'<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  up:'<path d="m6 15 6-6 6 6"/>', down:'<path d="m6 9 6 6 6-6"/>'
+};
+const ic = (n,w=2) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]}</svg>`;
+
+function loginHTML(){
+  return `<div class="hero">
+    <svg viewBox="0 0 320 170" aria-hidden="true"><ellipse cx="160" cy="160" rx="110" ry="8" fill="rgb(0 0 0/.18)"/>
+      <rect x="182" y="18" width="22" height="120" rx="11" transform="rotate(14 193 78)" fill="#e0a25a"/><path d="M186 40l14 4M183 62l14 4M180 84l14 4" stroke="#b87a35" stroke-width="3" stroke-linecap="round" transform="rotate(14 193 78)"/>
+      <circle cx="122" cy="62" r="26" fill="#2f9e55"/><circle cx="146" cy="50" r="22" fill="#3cb865"/><circle cx="104" cy="44" r="18" fill="#3cb865"/>
+      <circle cx="214" cy="76" r="20" fill="#e5533a"/><path d="M214 56c2-6 7-9 12-9" stroke="#1d5e33" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M86 72h148l-14 86H100z" fill="#f3e2c2"/><path d="M86 72h148l-3 18H89z" fill="#e3cca2"/><path d="M134 104c0 14 52 14 52 0" stroke="#c7ad7e" stroke-width="5" fill="none" stroke-linecap="round"/></svg>
+    <h1>QuickShop</h1><p>One list for the household.</p></div>
+  <form class="form" id="login">
+    <label for="email">Email</label><input class="field" id="email" type="email" value="doug@example.com" autocomplete="username">
+    <label for="pw">Password</label><input class="field" id="pw" type="password" value="sample-password" autocomplete="current-password">
+    <button class="primary" type="submit">Sign in</button>
+    <p class="hint">Accounts are created by hand for now, so there is no sign-up. Sample accounts: doug@ or alex@example.com, any password.</p>
+  </form>`;
+}
+
+function top(title, sub, right=''){ return `<header class="top"><div><p class="sub">${sub}</p><h1>${title}</h1></div>${right}</header>`; }
+
+function suggHTML(){
+  const q = S.q.trim().toLowerCase();
+  if (!q) return '';
+  const m = S.items.filter(i => i.name.toLowerCase().includes(q)).sort((a,b) => (b.name.toLowerCase().startsWith(q)) - (a.name.toLowerCase().startsWith(q)) || a.name.localeCompare(b.name)).slice(0,6);
+  const exact = m.some(i => i.name.toLowerCase() === q);
+  return `<ul class="sugg">${m.map(i => `<li><button data-act="add" data-id="${esc(i.id)}" ${onList(i.id)?'disabled':''}><span>${esc(i.name)}</span><small>${onList(i.id)?'On list':esc(i.cats.map(catName).join(', '))}</small></button></li>`).join('')}${exact?'':`<li><button data-act="create"><span>Create “${esc(S.q.trim())}”</span><small>New item</small></button></li>`}</ul>`;
+}
+
+function listHTML(){
+  const g = groups(S.entries), cart = S.entries.filter(e => e.status === 'in_cart').length;
+  const banner = S.trip ? `<button class="banner" data-act="resume"><span><b>${S.trip.by === S.user ? 'You are' : esc(nm(S.trip.by)) + ' is'} shopping</b> · ${cart} of ${S.entries.length} in cart</span><span>Resume</span></button>` : '';
+  const rows = g.map(gr => `<section class="grp"><h3>${esc(gr.name)}<span>${gr.entries.length}</span></h3><ul>${gr.entries.map(e => { const it = item(e.itemId); return `<li class="row ${e.fresh?'fresh':''} ${e.status==='in_cart'?'done':''}"><div class="main"><span class="nm">${esc(it.name)}</span><button class="note" data-act="note" data-id="${esc(e.id)}" ${off()}>${e.note?esc(e.note):'Add note'}</button></div><span class="by" title="Added by ${esc(nm(e.by))}">${esc(nm(e.by)[0])}</span><button class="icon" data-act="remove" data-id="${esc(e.id)}" aria-label="Remove ${esc(it.name)}" ${off()}>${ic('x')}</button></li>`; }).join('')}</ul></section>`).join('');
+  return top('Shopping list', `Home · ${plural(S.entries.length,'item')}`, `<button class="av" style="border:0" data-act="account" aria-label="Account">${esc(nm(S.user)[0])}</button>`) + banner +
+    `<div class="addbox"><input class="field" id="q" placeholder="Add milk, eggs, bread…" value="${esc(S.q)}" autocomplete="off" enterkeyhint="done" ${off()}>${suggHTML()}${S.online?'':'<p class="hint">Adding and editing need a connection.</p>'}</div>
+    <div class="scroll">${rows || '<div class="empty"><b>Nothing on the list</b>Add what you need for the next trip.</div>'}</div>` +
+    (S.trip ? '' : `<div class="dock"><button class="primary" data-act="start" ${S.entries.length?'':'disabled'}>Start shopping</button></div>`);
+}
+
+function shopHTML(){
+  const need = S.entries.filter(e => e.status === 'needed'), cart = S.entries.filter(e => e.status === 'in_cart'), total = S.entries.length;
+  const row = (e,on) => { const it = item(e.itemId); return `<li><button class="shoprow ${on?'on':''} ${e.fresh?'fresh':''}" data-act="toggle" data-id="${esc(e.id)}"><span class="ck">${on?ic('check',3):''}</span><span class="main"><span class="nm">${esc(it.name)}</span>${e.note?`<span class="sn">${esc(e.note)}</span>`:''}</span></button></li>`; };
+  return top(`${cart.length} of ${total} in cart`, `${S.trip.by===S.user?'Shopping':esc(nm(S.trip.by))+' is shopping'} · started ${time(S.trip.start)}`, `<button class="ghost" data-act="tolist">List</button>`) +
+    `<div class="progress"><i style="width:${total ? cart.length/total*100 : 0}%"></i></div>
+    <div class="scroll">${groups(need).map(g => `<section class="grp"><h3>${esc(g.name)}<span>${g.entries.length}</span></h3><ul>${g.entries.map(e => row(e,false)).join('')}</ul></section>`).join('') || '<div class="empty"><b>Everything is in the cart</b>Complete the trip when you check out.</div>'}
+    ${cart.length ? `<section class="grp cart"><h3>In cart<span>${cart.length}</span></h3><ul>${cart.map(e => row(e,true)).join('')}</ul></section>` : ''}</div>
+    <div class="dock"><button class="primary" data-act="completeAsk">Complete trip</button></div>`;
+}
+
+function summaryHTML(){
+  const t = S.summary;
+  return `<div class="hero"><span class="av" style="width:56px;height:56px;background:var(--on-green);color:var(--green)">${ic('check',3)}</span><h1>Trip done</h1><p>${plural(t.bought.length,'item')} · ${mins(t.start,t.end)} min</p></div>
+    <div class="scroll"><h2 class="sec">Bought</h2><ul>${t.bought.map(b => `<li class="row"><span class="nm">${esc(b)}</span></li>`).join('')}</ul>
+    ${t.left.length ? `<h2 class="sec">Still on your list</h2><p>These were not found, so they stay for next time.</p><ul>${t.left.map(b => `<li class="row"><span class="nm">${esc(b)}</span></li>`).join('')}</ul>` : ''}</div>
+    <div class="dock"><button class="primary" data-act="done">Back to list</button></div>`;
+}
+
+function catalogHTML(){
+  const q = S.cq.trim().toLowerCase(), match = i => !q || i.name.toLowerCase().includes(q);
+  const sections = [...S.categories.map(c => ({id:c.id, name:c.name, items:S.items.filter(i => i.cats.includes(c.id) && match(i))})),
+    {id:'none', name:'No category', items:S.items.filter(i => !i.cats.length && match(i))}].filter(s => s.items.length);
+  return top('Catalog', `${plural(S.items.length,'item')} · ${plural(S.categories.length,'category').replace('categorys','categories')}`, `<button class="ghost" data-act="newItem" ${off()}>New item</button>`) +
+    `<div class="addbox"><input class="field" id="cq" placeholder="Search items" value="${esc(S.cq)}" autocomplete="off"></div>
+    <div class="scroll">${sections.map(s => `<section class="grp"><h3>${esc(s.name)}<span>${s.items.length}</span></h3><ul>${s.items.sort((a,b) => a.name.localeCompare(b.name)).map(i => { const also = i.cats.filter(c => c !== s.id).map(catName); return `<li class="row"><button class="main" data-act="editItem" data-id="${esc(i.id)}" ${off()}><span class="nm">${esc(i.name)}</span>${also.length?`<span class="tags">Also in ${esc(also.join(', '))}</span>`:''}</button><button class="pill ${onList(i.id)?'on':''}" data-act="listToggle" data-id="${esc(i.id)}" ${off()}>${onList(i.id)?'On list':'Add'}</button></li>`; }).join('')}</ul></section>`).join('') || '<div class="empty"><b>No matches</b>Try another name, or create a new item.</div>'}</div>`;
+}
+
+function tabsHTML(){
+  return `<nav class="tabs">${[['list','List'],['catalog','Catalog']].map(([v,l]) => `<button class="${S.view===v?'on':''}" data-act="tab" data-v="${v}">${ic(v,1.9)}${l}</button>`).join('')}</nav>`;
+}
+
+function sheetHTML(){
+  const s = S.sheet;
+  if (!s) return '';
+  let body = '';
+  switch (s.kind) {
+    case 'item': body = `<h2>${s.id?'Edit item':'New item'}</h2><label for="sheetName">Name</label><input class="field" id="sheetName" value="${esc(s.name)}">
+      <p class="lab">Categories<small>Pick one or more. The first one decides where it shows on the list.</small></p>
+      <div class="chips">${S.categories.map(c => { const k = s.cats.indexOf(c.id); return `<button class="chip ${k>=0?'on':''}" data-act="chip" data-id="${esc(c.id)}">${k>=0?`<i>${k+1}</i>`:''}${esc(c.name)}</button>`; }).join('')}</div>
+      <div class="acts"><button class="primary" data-act="saveItem" ${s.name.trim()?'':'disabled'}>${s.id?'Save':s.addToList?'Create and add to list':'Create item'}</button>${s.id?'<button class="ghost danger" data-act="deleteItem">Delete item</button>':''}<button class="ghost" data-act="close">Cancel</button></div>`; break;
+    case 'note': body = `<h2>Note for ${esc(item(S.entries.find(e => e.id === s.id).itemId).name)}</h2><p>Quantity, brand, anything the shopper should know.</p><textarea class="field" id="noteText" placeholder="2 gallons, the good kind…">${esc(s.text)}</textarea><div class="acts"><button class="primary" data-act="saveNote">Save note</button><button class="ghost" data-act="close">Cancel</button></div>`; break;
+    case 'account': body = `<h2>${esc(nm(S.user))}</h2><p>${esc(USERS[S.user].email)} · Home household</p><div class="acts"><button class="ghost danger" data-act="signout">Sign out</button><button class="ghost" data-act="close">Close</button></div>`; break;
+    case 'complete': { const c = S.entries.filter(e => e.status === 'in_cart').length, l = S.entries.length - c;
+      body = `<h2>Complete trip?</h2><p>${plural(c,'item')} in the cart will be cleared from the list.${l?` ${plural(l,'item')} not found will stay on the list for next time.`:''}</p><div class="acts"><button class="primary" data-act="completeDo">Complete trip</button><button class="ghost" data-act="close">Keep shopping</button></div>`; break; }
+  }
+  return `<div class="scrim" data-act="close"></div><div class="sheet" role="dialog" aria-modal="true">${body}</div>`;
+}
+
+function appHTML(){
+  const t = S.toast ? `<div class="toast" role="status">${esc(S.toast)}</div>` : '';
+  if (!S.user) return loginHTML() + t;
+  if (S.summary) return summaryHTML() + t;
+  const offline = S.online ? '' : `<div class="offline">Offline · ${S.pending ? plural(S.pending,'change') + ' waiting to sync' : 'shopping still works'}</div>`;
+  const shopping = S.view === 'shop' && S.trip;
+  const views = {list:listHTML, catalog:catalogHTML};
+  return offline + (shopping ? shopHTML() : (views[S.view] || listHTML)() + tabsHTML()) + sheetHTML() + t;
+}
+
+function panelHTML(){
+  const o = S.user ? nm(other()) : 'Alex';
+  return `<div class="ph"><h2>Mockup controls</h2><button class="icon" data-act="panel" aria-label="Close">${ic('x')}</button></div>
+    <p>${S.user ? 'Signed in as ' + esc(nm(S.user)) + '.' : 'Not signed in.'} These stand in for the other phone and the network.</p>
+    <div class="simbtns">
+      <button data-act="simAdd" ${S.user?'':'disabled'}>${esc(o)} adds an item</button>
+      <button data-act="simCheck" ${S.user&&S.trip?'':'disabled'}>${esc(o)} checks one off</button>
+      <button data-act="simNet">${S.online?'Go offline':'Come back online'}</button>
+      <button data-act="simSwitch" ${S.user?'':'disabled'}>View as ${esc(o)}</button>
+      <button data-act="simReset">Reset sample data</button>
+    </div>
+    <h3>Decided so far</h3><ol>
+      <li>Items in several categories show under their first one.</li>
+      <li>Starting, checking off and completing a trip all work offline and sync later. Adding and editing need a connection.</li>
+      <li>Items not found stay on the list after a trip.</li>
+      <li>One free-text note per entry, no quantity field.</li>
+      <li>One shopper at a time. The other person sees who is shopping and can still add items.</li>
+      <li>Later: a location per store for each item. Categories stand in for now.</li>
+    </ol>
+    <p class="small">Doug, Alex and every item are sample data, saved only in this browser.</p>`;
+}
+
+function render(){
+  const a = document.activeElement, fid = a && a.id, pos = a && a.selectionStart;
+  $('#app').innerHTML = appHTML();
+  const p = $('#panel'); p.innerHTML = panelHTML(); p.classList.toggle('open', S.panel);
+  if (fid) { const e = document.getElementById(fid); if (e && !e.disabled) { e.focus(); try { e.setSelectionRange(pos,pos); } catch(_){} } }
+  save();
+}
+const focusSoon = id => setTimeout(() => { const e = document.getElementById(id); if (e) e.focus(); }, 30);
+const entry = id => S.entries.find(e => e.id === id);
+
+const ACT = {
+  tab: (_,b) => { S.view = b.dataset.v; S.q = ''; render(); },
+  start: () => { if (!S.online) S.pending++; S.trip = {by:S.user, start:Date.now()}; S.view = 'shop'; render(); },
+  resume: () => { S.view = 'shop'; render(); },
+  tolist: () => { S.view = 'list'; render(); },
+  toggle: id => { const e = entry(id); if (!e) return; e.status = e.status === 'needed' ? 'in_cart' : 'needed'; if (!S.online) S.pending++; render(); },
+  remove: id => { S.entries = S.entries.filter(e => e.id !== id); render(); },
+  note: id => { S.sheet = {kind:'note', id, text:entry(id).note}; render(); focusSoon('noteText'); },
+  saveNote: () => { entry(S.sheet.id).note = S.sheet.text.trim(); S.sheet = null; render(); },
+  add: id => { addEntry(id, S.user); S.q = ''; render(); focusSoon('q'); },
+  create: () => { S.sheet = {kind:'item', id:null, name:S.q.trim(), cats:[], addToList:true}; S.q = ''; render(); },
+  newItem: () => { S.sheet = {kind:'item', id:null, name:'', cats:[], addToList:false}; render(); focusSoon('sheetName'); },
+  editItem: id => { const i = item(id); S.sheet = {kind:'item', id, name:i.name, cats:[...i.cats]}; render(); },
+  chip: id => { const c = S.sheet.cats, k = c.indexOf(id); if (k < 0) c.push(id); else c.splice(k,1); render(); },
+  saveItem: () => { const s = S.sheet, name = s.name.trim(); if (!name) return;
+    if (s.id) { Object.assign(item(s.id), {name, cats:s.cats}); S.sheet = null; return toast('Saved ' + name); }
+    const i = {id:nid('i'), name, cats:s.cats}; S.items.push(i); if (s.addToList) addEntry(i.id, S.user); S.sheet = null;
+    toast(s.addToList ? `Added ${name} to the list` : `Created ${name}`); },
+  deleteItem: () => { const id = S.sheet.id; S.items = S.items.filter(i => i.id !== id); S.entries = S.entries.filter(e => e.itemId !== id); S.sheet = null; render(); },
+  listToggle: id => { if (onList(id)) S.entries = S.entries.filter(e => e.itemId !== id); else addEntry(id, S.user); render(); },
+  completeAsk: () => { S.sheet = {kind:'complete'}; render(); },
+  completeDo: () => { if (!S.online) S.pending++; const name = e => item(e.itemId).name + (e.note ? ` (${e.note})` : '');
+    const t = {id:nid('t'), by:S.trip.by, start:S.trip.start, end:Date.now(), bought:S.entries.filter(e => e.status === 'in_cart').map(name), left:S.entries.filter(e => e.status === 'needed').map(name)};
+    S.trips.push(t); S.entries = S.entries.filter(e => e.status === 'needed'); S.trip = null; S.summary = t; S.sheet = null; S.view = 'list'; render(); },
+  done: () => { S.summary = null; S.view = 'list'; render(); },
+  close: () => { S.sheet = null; render(); },
+  account: () => { S.sheet = {kind:'account'}; render(); },
+  signout: () => { S.user = null; S.view = 'list'; S.sheet = null; render(); },
+  panel: () => { S.panel = !S.panel; render(); },
+  simAdd: () => { const pool = S.items.filter(i => !onList(i.id)); if (!pool.length) return toast('Everything is already on the list');
+    const i = pool[Math.floor(Math.random()*pool.length)]; addEntry(i.id, other()); toast(`${nm(other())} added ${i.name}`); },
+  simCheck: () => { const need = S.entries.filter(e => e.status === 'needed'); if (!need.length) return toast('Nothing left to check');
+    const e = need[Math.floor(Math.random()*need.length)]; e.status = 'in_cart'; toast(`${nm(other())} put ${item(e.itemId).name} in the cart`); },
+  simNet: () => { S.online = !S.online; if (S.online && S.pending) { const k = S.pending; S.pending = 0; toast(`Back online · synced ${plural(k,'change')}`); } else render(); },
+  simSwitch: () => { S.user = other(); S.sheet = null; toast('Now viewing as ' + nm(S.user)); },
+  simReset: () => { S = {...seed(), user:S.user, panel:S.panel}; toast('Sample data reset'); }
+};
+
+document.addEventListener('click', ev => {
+  const b = ev.target.closest('[data-act]');
+  if (!b || b.disabled) return;
+  const f = ACT[b.dataset.act];
+  if (f) { ev.preventDefault(); f(b.dataset.id, b); }
+});
+document.addEventListener('input', ev => {
+  const t = ev.target, v = t.value;
+  if (t.id === 'q') S.q = v; else if (t.id === 'cq') S.cq = v;
+  else if (t.id === 'sheetName' && S.sheet) S.sheet.name = v;
+  else if (t.id === 'noteText' && S.sheet) { S.sheet.text = v; return; }
+  else return;
+  render();
+});
+document.addEventListener('keydown', ev => {
+  if (ev.key === 'Escape' && S.sheet) { S.sheet = null; render(); }
+  if (ev.key === 'Enter' && ev.target.id === 'q') { ev.preventDefault(); const b = document.querySelector('.sugg button:not(:disabled)'); if (b) b.click(); }
+});
+document.addEventListener('submit', ev => {
+  if (ev.target.id !== 'login') return;
+  ev.preventDefault();
+  S.user = $('#email').value.trim().toLowerCase().startsWith('alex') ? 'alex' : 'doug';
+  render();
+});
+
+window.claude?.hot?.snapshot?.(() => ({...S, sheet:null, toast:''}));
+const boot = d => { S = d && d.items ? d : load(); render(); };
+window.claude?.hot?.ready ? window.claude.hot.ready(boot) : boot(window.claude?.hot?.data ?? {});
+}
+</script>
