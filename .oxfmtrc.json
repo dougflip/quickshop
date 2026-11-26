@@ -1,5 +1,5 @@
 {
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
   "printWidth": 100,
-  "ignorePatterns": ["package-lock.json", "docs/mockups/**"]
+  "ignorePatterns": [".claude/**", ".mcp.json", "docs/mockups/**", "package-lock.json"]
 }
