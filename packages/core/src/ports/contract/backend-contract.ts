@@ -17,7 +17,8 @@ import {
 import type { Result } from "../../domain/result.ts";
 import type { ListEntry } from "../../domain/types.ts";
 import type { AuthPort } from "../auth.ts";
-import type { BackendPort, Change, Mutation } from "../backend.ts";
+import type { Change, Mutation } from "../../domain/mutation.ts";
+import type { BackendPort } from "../backend.ts";
 
 export type ContractPerson = "doug" | "alex" | "olive";
 

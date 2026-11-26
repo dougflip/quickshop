@@ -15,8 +15,10 @@ The long-term goal is a list that knows which store you're in and orders items b
 
 ```
 packages/
-  core/   plain TypeScript: domain logic, ports, engine. No UI or provider code
-docs/     planning, data model, milestones, mockup, v1 reference data
+  core/             plain TypeScript: domain logic, ports, engine. No UI or provider code
+  adapter-memory/   in-memory backend for tests and the harness
+  scenarios/        headless end-to-end tests: real engines against the in-memory backend
+docs/               planning, data model, milestones, mockup, v1 reference data
 ```
 
 More packages arrive with each milestone (adapters, web app).

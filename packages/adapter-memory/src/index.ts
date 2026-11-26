@@ -1,4 +1,4 @@
-export { applyMutation, type Applied, type StoredHousehold } from "./apply-mutation.ts";
+export { serverApply, type ServerApplied, type StoredHousehold } from "./apply-mutation.ts";
 export {
   createMemoryServer,
   type MemoryConnection,
@@ -8,3 +8,4 @@ export {
   type MemoryUser,
 } from "./memory-server.ts";
 export { createManualClock, createMemoryLocalStore, createSequentialIds } from "./device.ts";
+export { createSampleSeed, sample, sampleCategoryId, sampleItemId } from "./sample-seed.ts";

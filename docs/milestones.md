@@ -13,6 +13,7 @@ packages/
   core/              plain TS: domain, ports, engine, offline queue. No React, no Supabase
   adapter-memory/    in-memory backend for tests and the harness. Several clients can share one
   adapter-supabase/  implements the ports with Supabase
+  scenarios/         headless end-to-end tests: real engines against the in-memory backend
   web/               React + Vite PWA. Starts as the harness (M5), becomes the real app (M8)
 supabase/            migrations, access rules, complete_trip function, seed
 docs/                overview, planning, data model, milestones, mockup
@@ -55,12 +56,14 @@ Dependency rule, checked by lint: `core` imports nothing from the other packages
 
 **Done when:** the contract suite passes against the in-memory adapter.
 
-## M3: Engine
+## M3: Engine ✅
 
-- `createEngine(ports)` returns `{ getState, subscribe, commands }`. This is the only thing the UI uses.
-- Session as a union: `signedOut | signingIn | signedIn { user, household } | error`. Signing in loads the first household.
-- Commands update local state immediately, then call the repo. A failure rolls the change back and adds an error to state.
-- Changes from the other person arrive as events and are merged in.
+- `createEngine(deps)` returns the only object the UI uses: `getState()`, `subscribe()`, and commands (`addToList`, `toggleInCart`, `completeTrip`, …).
+- State as a union: `starting | signedOut | loading | noHousehold | loadFailed | ready`. Signing in loads the first household.
+- Commands are checked locally first: an invalid one returns a typed error and sends nothing. A valid one shows at once and is sent in order. The screen shows the server's data with this device's unconfirmed changes applied on top, so a change the server refuses simply drops out and becomes a `notice`.
+- Live changes from the other person are merged in. Subscribing happens before loading, so nothing is missed in between.
+- `applyMutation` moved into core so the device and every backend apply changes with the same rules.
+- Scenario tests live in `packages/scenarios`, which may import both core and the in-memory adapter.
 
 **Done when:** a headless scenario test, with two engines on one in-memory backend, has Doug add Milk and Alex's state show it, then has Alex start a trip and Doug's state show "Alex is shopping".
 

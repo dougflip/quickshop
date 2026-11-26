@@ -13,7 +13,7 @@ import {
   type Session,
   type UserId,
 } from "@quickshop/core";
-import { applyMutation, type StoredHousehold } from "./apply-mutation.ts";
+import { serverApply, type StoredHousehold } from "./apply-mutation.ts";
 
 export type MemoryUser = {
   readonly id: UserId;
@@ -158,7 +158,7 @@ export function createMemoryServer(seed: MemorySeed): MemoryServer {
         guard(householdId, (userId) => {
           const h = households.get(householdId);
           if (h === undefined) return err({ kind: "unauthorized" });
-          const result = applyMutation(h.stored, mutation, userId);
+          const result = serverApply(h.stored, mutation, userId);
           if (!result.ok) return result;
           h.stored = result.value.household;
           publish(householdId, result.value.changes);
