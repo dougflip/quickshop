@@ -32,7 +32,7 @@ Dependency rule, checked by lint: `core` imports nothing from the other packages
 
 **Done when:** a placeholder test passes and `check` is green locally and in CI.
 
-## M1: Core domain (pure functions)
+## M1: Core domain (pure functions) ✅
 
 - Branded ids, `EntryStatus`, `ShopState`, `ListEntry`, `Item`, `Category`, `Trip`.
 - Pure functions, each taking state and returning new state or a typed error (a `Result` union, no exceptions):
