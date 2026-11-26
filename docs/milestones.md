@@ -43,11 +43,15 @@ Dependency rule, checked by lint: `core` imports nothing from the other packages
 
 **Done when:** unit tests cover every function, including the error cases.
 
-## M2: Ports and in-memory adapter
+## M2: Ports and in-memory adapter ✅
 
-- Interfaces in `core/ports`: `AuthPort`, `CatalogRepo`, `ListRepo`, `TripRepo`, `RealtimePort` (subscribe to household changes), `LocalStore` (saves the offline queue on the device), `NetworkStatus`.
-- `adapter-memory`: one shared fake backend that several clients can connect to, sending change events to each. It can be switched "offline" per client.
-- **Contract tests**: one shared test suite for the ports, which any adapter must pass. M7 runs the same suite against Supabase.
+- Interfaces in `core/ports`:
+  - `AuthPort`: sign in, sign out, current session.
+  - `BackendPort`: list and load households, `apply(mutation)`, and `subscribe` to live changes. Every write is one `Mutation` union (`createItem | addEntry | startTrip | setEntryStatus | completeTrip | …`), the same shape the M4 offline queue stores and replays.
+  - `LocalStore`, `NetworkStatus`, `Clock`, `IdGenerator`.
+- Server rules every backend follows: the signed-in user is recorded as author; repeated, stale or orphaned mutations return `ignored`; real conflicts return `rejected` with the domain error.
+- `adapter-memory`: one shared server that several connections can use, each with its own session and an online/offline switch. Changes are delivered asynchronously, like a real change feed.
+- **Contract tests** in `@quickshop/core/contract`: one shared suite any backend must pass. M7 runs the same suite against Supabase.
 
 **Done when:** the contract suite passes against the in-memory adapter.
 

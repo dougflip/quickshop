@@ -32,7 +32,8 @@
     "typescript/strict-boolean-expressions": "off",
     "import/no-cycle": "error",
     "consistent-return": "off",
-    "typescript/consistent-return": "off"
+    "typescript/consistent-return": "off",
+    "oxc/no-map-spread": "off"
   },
   "overrides": [
     {
@@ -53,6 +54,26 @@
               {
                 "group": ["@supabase/*"],
                 "message": "Only adapter-supabase may import Supabase."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["packages/adapter-*/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@quickshop/web", "@quickshop/adapter-*"],
+                "message": "Adapters depend only on core."
+              },
+              {
+                "group": ["react", "react-dom", "react/*"],
+                "message": "Adapters must not depend on a UI library."
               }
             ]
           }

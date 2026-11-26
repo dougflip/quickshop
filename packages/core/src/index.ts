@@ -7,3 +7,4 @@ export * from "./domain/names.ts";
 export * from "./domain/catalog.ts";
 export * from "./domain/list.ts";
 export * from "./domain/trip.ts";
+export type * from "./ports/index.ts";
