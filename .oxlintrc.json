@@ -5,7 +5,7 @@
     "denyWarnings": true,
     "reportUnusedDisableDirectives": "error"
   },
-  "plugins": ["typescript", "unicorn", "oxc", "import", "vitest"],
+  "plugins": ["typescript", "unicorn", "oxc", "import", "vitest", "react"],
   "categories": {
     "correctness": "error",
     "suspicious": "error",
@@ -33,7 +33,8 @@
     "import/no-cycle": "error",
     "consistent-return": "off",
     "typescript/consistent-return": "off",
-    "oxc/no-map-spread": "off"
+    "oxc/no-map-spread": "off",
+    "react/react-in-jsx-scope": "off"
   },
   "overrides": [
     {
@@ -78,6 +79,28 @@
             ]
           }
         ]
+      }
+    },
+    {
+      "files": ["packages/web/src/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@quickshop/adapter-*"],
+                "message": "Only src/main.tsx (the composition root) may choose an adapter."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["packages/web/src/main.tsx"],
+      "rules": {
+        "no-restricted-imports": "off"
       }
     }
   ]

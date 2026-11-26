@@ -1,4 +1,4 @@
-import type { DomainError } from "../domain/errors.ts";
+import { describeError, type DomainError } from "../domain/errors.ts";
 import {
   asEntryId,
   asItemId,
@@ -72,6 +72,26 @@ export type NotReady = { readonly kind: "notReady" };
 export type Offline = { readonly kind: "offline" };
 export type CommandError = DomainError | NotReady | Offline;
 export type CommandResult<T = void> = Result<T, CommandError>;
+
+/** A short message a UI can show as-is. */
+export function describeCommandError(error: CommandError): string {
+  switch (error.kind) {
+    case "notReady":
+      return "Still loading. Try again in a moment.";
+    case "offline":
+      return "You're offline. Adding and editing need a connection; shopping still works.";
+    case "emptyName":
+    case "duplicateItemName":
+    case "itemNotFound":
+    case "categoryNotFound":
+    case "alreadyOnList":
+    case "entryNotFound":
+    case "tripAlreadyInProgress":
+    case "noTripInProgress":
+    case "tripMismatch":
+      return describeError(error);
+  }
+}
 
 export type Engine = {
   getState: () => EngineState;

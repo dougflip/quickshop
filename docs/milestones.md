@@ -83,10 +83,12 @@ Dependency rule, checked by lint: `core` imports nothing from the other packages
 3. Replaying the same queue twice gives the same result.
 4. Reloading the app while offline (a new engine on the same `LocalStore`) keeps the queue.
 
-## M5: Bare-bones harness UI
+## M5: Bare-bones harness UI ✅
 
 - `web` with React + Vite and an unstyled page: sign in, list with quick add, catalog, shop/check/complete. Plus controls that copy the mockup's panel: switch user, go offline, reset.
 - Runs on the in-memory adapter. Components only read engine state and call commands. One hook (`useEngine`, built on `useSyncExternalStore`) connects them.
+
+Run it with `npm run dev`. Two phones (Doug and Alex) sit side by side, each with Online, Server reachable and Relaunch app controls. `npm run check` now also builds the web app.
 
 **Done when:** you can do the whole loop in the browser, including an offline trip. No component contains business logic. Anything that isn't a render or a command call is a sign logic is leaking from `core`.
 

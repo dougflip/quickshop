@@ -12,7 +12,9 @@
     "test:watch": "vitest",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
-    "check": "npm run typecheck && npm run lint && npm run format:check && npm run test"
+    "check": "npm run typecheck && npm run lint && npm run format:check && npm run test && npm run build",
+    "build": "npm run build --workspaces --if-present",
+    "dev": "npm run dev -w @quickshop/web"
   },
   "devDependencies": {
     "oxfmt": "^0.80.0",

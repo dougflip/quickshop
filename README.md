@@ -18,6 +18,7 @@ packages/
   core/             plain TypeScript: domain logic, ports, engine. No UI or provider code
   adapter-memory/   in-memory backend for tests and the harness
   scenarios/        headless end-to-end tests: real engines against the in-memory backend
+  web/              React + Vite app; currently the two-phone harness on the in-memory backend
 docs/               planning, data model, milestones, mockup, v1 reference data
 ```
 
@@ -29,6 +30,7 @@ Requires Node 26 (see `.nvmrc`).
 
 ```sh
 npm install
-npm run check   # typecheck (tsc), lint (oxlint), format check (oxfmt), tests
+npm run dev     # two-phone harness at http://localhost:5173
+npm run check   # typecheck (tsc), lint (oxlint), format check (oxfmt), tests, build
 npm run test:watch
 ```
