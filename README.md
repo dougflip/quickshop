@@ -1,16 +1,32 @@
 # QuickShop
 
-Web app for building and tracking a shopping list.
+A shared, real-time shopping list for a household, installable as a PWA. You build the list together, then one person shops and checks items off, even with a bad signal in the store.
 
-## About
+The long-term goal is a list that knows which store you're in and orders items by your path through it. See [docs/overview.md](docs/overview.md).
 
-🚧 🚧 🚧 Under Construction 🚧 🚧 🚧
+## Docs
 
-This is barely anything at this point. Basically trying to get _something_
-to take to the store this weekend and try out.
+- [Planning and decisions](docs/planning.md)
+- [Data model](docs/data-model.md)
+- [Milestones](docs/milestones.md)
+- [Clickable mockup](docs/mockups/index.html) (open the file in a browser)
 
-The idea at this point is to manage selections from a static list in local storage.
-This should allow me to select items and mark them off as I put them in my cart.
+## Layout
 
-I am sure there are many versions of this that already exist.
-Eventually, the hope is to customize this to my exact needs.
+```
+packages/
+  core/   plain TypeScript: domain logic, ports, engine. No UI or provider code
+docs/     planning, data model, milestones, mockup, v1 reference data
+```
+
+More packages arrive with each milestone (adapters, web app).
+
+## Development
+
+Requires Node 26 (see `.nvmrc`).
+
+```sh
+npm install
+npm run check   # typecheck (tsc), lint (oxlint), format check (oxfmt), tests
+npm run test:watch
+```

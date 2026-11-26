@@ -22,11 +22,11 @@ Dependency rule, checked by lint: `core` imports nothing from the other packages
 
 ---
 
-## M0: Reset the repo and set up tooling
+## M0: Reset the repo and set up tooling ✅
 
-- Delete v1 (`packages/*` and the built site in `docs/`). Keep v1's item and department list as seed input for M6. It's also in git history.
+- Delete v1 (`packages/*` and the built site in `docs/`). v1's 85 items and 17 departments are kept in [reference/v1-catalog.json](./reference/v1-catalog.json) as seed input for M6.
 - Move `v2/*` into `docs/`.
-- npm workspaces, TypeScript `strict` (plus `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`), ESLint with `switch-exhaustiveness-check` and the import rule above, Prettier, Vitest.
+- npm workspaces, TypeScript `strict` (plus `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`), oxlint (type-aware) with `switch-exhaustiveness-check` and the import rule above, oxfmt, Vitest.
 - One root `npm run check` that runs typecheck + lint + tests.
 - GitHub Actions runs `check` on every push and PR.
 
@@ -68,6 +68,7 @@ Dependency rule, checked by lint: `core` imports nothing from the other packages
 - The state shows how many changes are waiting.
 
 **Done when** scenario tests cover:
+
 1. Start, check items and complete a trip fully offline, then reconnect. The server ends up correct.
 2. Alex adds an item mid-trip while Doug is offline. It survives Doug's offline complete.
 3. Replaying the same queue twice gives the same result.
@@ -97,6 +98,7 @@ Dependency rule, checked by lint: `core` imports nothing from the other packages
 ## M8: Real UI (one screen per step)
 
 Built to match the mockup, still against the engine only:
+
 - **8a** Sign in + account sheet
 - **8b** List + quick add + create item + notes
 - **8c** Catalog + item editor (categories in order)
