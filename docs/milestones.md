@@ -4,7 +4,7 @@ Each milestone is small and ends with something you can check. The core comes fi
 
 See [planning.md](./planning.md) for decisions and [data-model.md](./data-model.md) for the schema.
 
-M0–M5 need no Docker. M6–M7 run Supabase locally through Docker, so they'll be done on a separate development machine.
+M6 onwards use a hosted Supabase project, so nothing needs Docker.
 
 ## Target layout
 
@@ -92,19 +92,20 @@ Run it with `npm run dev`. Two phones (Doug and Alex) sit side by side, each wit
 
 **Done when:** you can do the whole loop in the browser, including an offline trip. No component contains business logic. Anything that isn't a render or a command call is a sign logic is leaking from `core`.
 
-## M6: Supabase schema
+## M6: Supabase schema ✅
 
-- Local Supabase through the Supabase CLI (needs Docker). Migrations for every table in the data model, the indexes (case-insensitive unique name, one entry per item, one trip in progress per household), `is_member()`, access rules on every table, and the `complete_trip` function.
-- Seed: two accounts (passwords from an env file, not committed), the "Home" household, categories in your store's order, and a starter catalog from v1's list.
+- One hosted Supabase project (no local Supabase, no Docker), managed through the Supabase MCP. See [supabase/README.md](../supabase/README.md).
+- Migration for every table in the data model, the indexes (case-insensitive unique name, one entry per item, one trip in progress per household), composite keys so rows can't cross households, `private.is_member()`, access rules on every table, grants to `authenticated` only, and the `complete_trip` function.
+- Seed: the "Home" household with the v1 catalog (17 categories, 85 items). Accounts are created in the dashboard and added as members.
 
-**Done when:** SQL tests show a member can read and write their household, a non-member can't see anything, and `complete_trip` is all-or-nothing.
+**Done when:** SQL checks show a member can read and write their household, a non-member can't see anything, and `complete_trip` is all-or-nothing (`supabase/tests/access.sql`, 18 checks), and both accounts see the seeded household.
 
 ## M7: Supabase adapter
 
 - Implement every port with `supabase-js`, using Supabase's live-update feature filtered by `household_id`.
 - Map database rows to core types inside the adapter only.
 
-**Done when:** the M2 contract suite passes against local Supabase, and the harness, pointed at Supabase through an env flag, does a real trip between two browser windows.
+**Done when:** the M2 contract suite passes against the hosted project, and the harness, pointed at Supabase through an env flag, does a real trip between two browser windows.
 
 ## M8: Real UI (one screen per step)
 
@@ -120,7 +121,6 @@ Built to match the mockup, still against the engine only:
 ## M9: PWA and deploy
 
 - Web manifest, icons, and a service worker that saves the app files so it opens without a connection (`vite-plugin-pwa`).
-- Hosted Supabase project with the migrations and seed applied.
 - GitHub Actions builds and deploys to GitHub Pages on every push to `main`.
 
 **Done when:** it's installed on both phones and you complete one real shopping trip with it.
