@@ -17,12 +17,14 @@ export type Phone = {
  * knows that, so components never import an adapter.
  */
 export type World = {
+  /** One line about what is behind the harness. */
+  readonly description: string;
   subscribe: (listener: () => void) => () => void;
   getPhones: () => readonly Phone[];
   setOnline: (phoneId: string, online: boolean) => void;
   setServerReachable: (phoneId: string, reachable: boolean) => void;
   /** Closes the app on that phone and opens it again, keeping its device storage. */
   relaunch: (phoneId: string) => void;
-  /** Throws everything away and starts over from the sample household. */
-  reset: () => void;
+  /** Throws everything away and starts over from the sample household. Null on a real backend. */
+  reset: (() => void) | null;
 };

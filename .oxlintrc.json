@@ -90,7 +90,7 @@
             "patterns": [
               {
                 "group": ["@quickshop/adapter-*"],
-                "message": "Only src/main.tsx (the composition root) may choose an adapter."
+                "message": "Only src/main.tsx and src/composition/ (the composition root) may choose an adapter."
               }
             ]
           }
@@ -98,7 +98,7 @@
       }
     },
     {
-      "files": ["packages/web/src/main.tsx"],
+      "files": ["packages/web/src/main.tsx", "packages/web/src/composition/**"],
       "rules": {
         "no-restricted-imports": "off"
       }

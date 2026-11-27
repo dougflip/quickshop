@@ -1,0 +1,15 @@
+{
+  "name": "@quickshop/adapter-supabase",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@quickshop/core": "*",
+    "@supabase/supabase-js": "^2.119.2"
+  }
+}

@@ -10,11 +10,13 @@
     "lint": "oxlint",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:live": "vitest run --config vitest.live.config.ts",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "check": "npm run typecheck && npm run lint && npm run format:check && npm run test && npm run build",
     "build": "npm run build --workspaces --if-present",
-    "dev": "npm run dev -w @quickshop/web"
+    "dev": "npm run dev -w @quickshop/web",
+    "dev:supabase": "npm run dev:supabase -w @quickshop/web"
   },
   "devDependencies": {
     "oxfmt": "^0.80.0",

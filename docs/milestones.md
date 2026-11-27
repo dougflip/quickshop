@@ -12,7 +12,7 @@ M6 onwards use a hosted Supabase project, so nothing needs Docker.
 packages/
   core/              plain TS: domain, ports, engine, offline queue. No React, no Supabase
   adapter-memory/    in-memory backend for tests and the harness. Several clients can share one
-  adapter-supabase/  implements the ports with Supabase
+  adapter-supabase/  implements the ports with Supabase (database functions + Broadcast)
   scenarios/         headless end-to-end tests: real engines against the in-memory backend
   web/               React + Vite PWA. Starts as the harness (M5), becomes the real app (M8)
 supabase/            migrations, access rules, complete_trip function, seed
@@ -100,12 +100,18 @@ Run it with `npm run dev`. Two phones (Doug and Alex) sit side by side, each wit
 
 **Done when:** SQL checks show a member can read and write their household, a non-member can't see anything, and `complete_trip` is all-or-nothing (`supabase/tests/access.sql`, 18 checks), and both accounts see the seeded household.
 
-## M7: Supabase adapter
+## M7: Supabase adapter ✅
 
-- Implement every port with `supabase-js`, using Supabase's live-update feature filtered by `household_id`.
-- Map database rows to core types inside the adapter only.
+- `adapter-supabase` implements the ports with `supabase-js`. The app calls three database functions and never touches tables directly: `my_households`, `load_household` (one consistent snapshot) and `apply_mutation` (one request per change, atomic, serialized per household). The SQL returns core's JSON shapes, and the adapter only checks them and brands the ids (`decode.ts`).
+- `apply_mutation` mirrors core's `applyMutation` rules. The contract suite is what keeps the two in step.
+- Live updates use Broadcast from database triggers to a private channel per household, with a `realtime.messages` policy that only lets members join. Postgres Changes was dropped because it sends deletes to every subscriber.
+- `BackendPort.subscribe` now promises that changes committed after a following `loadHousehold` are delivered. The adapter makes a load wait for a channel that is still joining, so the engine's "subscribe, then load" holds on a real network.
+- `npm run test:live` runs the contract against the hosted project with throwaway accounts (service key from `.env.local`). `npm run check` stays offline.
+- `npm run dev:supabase`: the harness with one phone per window on the hosted project. Online and Server reachable are simulated by the adapter.
 
-**Done when:** the M2 contract suite passes against the hosted project, and the harness, pointed at Supabase through an env flag, does a real trip between two browser windows.
+Known gaps, for M9: the device copy is in memory (a reload loses the offline queue), and if the live channel drops and rejoins without the browser going offline, changes in between show up only on the next reload.
+
+**Done when:** the M2 contract suite passes against the hosted project (26 of 26), and the harness, pointed at Supabase through an env flag, does a real trip between two browser windows.
 
 ## M8: Real UI (one screen per step)
 

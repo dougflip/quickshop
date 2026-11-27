@@ -68,6 +68,20 @@ function expectErr<T, E>(result: Result<T, E>): E {
   throw new Error(`expected an error, got ${JSON.stringify(result.value)}`);
 }
 
+/** Live changes can take a moment on a real backend. */
+const waitLong = { timeout: 10_000, interval: 50 };
+
+/** Subscribes, then loads, which is when delivery is guaranteed to have started (see BackendPort). */
+async function listen(
+  connection: ContractConnection,
+  householdId: HouseholdId,
+  onChange: (change: Change) => void,
+) {
+  const unsubscribe = connection.backend.subscribe(householdId, onChange);
+  await connection.backend.loadHousehold(householdId);
+  return unsubscribe;
+}
+
 async function signedIn(world: ContractWorld, who: ContractPerson) {
   const connection = await world.connect();
   const { email, password } = world.credentials[who];
@@ -425,30 +439,31 @@ export function backendContract(name: string, setup: () => Promise<ContractWorld
         const alex = await signedIn(world, "alex");
         const toAlex: Change[] = [];
         const toDoug: Change[] = [];
-        alex.backend.subscribe(world.householdId, (c) => toAlex.push(c));
+        await listen(alex, world.householdId, (c) => toAlex.push(c));
         const doug = await world.connect();
         expectOk(
           await doug.auth.signIn(world.credentials.doug.email, world.credentials.doug.password),
         );
-        doug.backend.subscribe(world.householdId, (c) => toDoug.push(c));
+        await listen(doug, world.householdId, (c) => toDoug.push(c));
 
         expectOk(await apply({ kind: "removeEntry", entryId: world.entries.milk }));
         const expected = { kind: "entryDeleted", entryId: world.entries.milk };
         await vi.waitFor(() => {
           expect(toAlex).toContainEqual(expected);
           expect(toDoug).toContainEqual(expected);
-        });
+        }, waitLong);
       });
 
       it("sends the full saved row", async () => {
         const { world, apply, entry } = await homeAs("doug");
         const alex = await signedIn(world, "alex");
         const changes: Change[] = [];
-        alex.backend.subscribe(world.householdId, (c) => changes.push(c));
+        await listen(alex, world.householdId, (c) => changes.push(c));
         const added = entry(asEntryId(world.newId()), world.items.bananas);
         expectOk(await apply({ kind: "addEntry", entry: added }));
-        await vi.waitFor(() =>
-          expect(changes).toContainEqual({ kind: "entrySaved", entry: added }),
+        await vi.waitFor(
+          () => expect(changes).toContainEqual({ kind: "entrySaved", entry: added }),
+          waitLong,
         );
       });
 
@@ -456,7 +471,7 @@ export function backendContract(name: string, setup: () => Promise<ContractWorld
         const { world, apply } = await homeAs("doug");
         const alex = await signedIn(world, "alex");
         const changes: Change[] = [];
-        const unsubscribe = alex.backend.subscribe(world.householdId, (c) => changes.push(c));
+        const unsubscribe = await listen(alex, world.householdId, (c) => changes.push(c));
         unsubscribe();
         expectOk(await apply({ kind: "removeEntry", entryId: world.entries.milk }));
         await world.settle();
@@ -467,7 +482,7 @@ export function backendContract(name: string, setup: () => Promise<ContractWorld
         const { world, apply } = await homeAs("doug");
         const olive = await signedIn(world, "olive");
         const changes: Change[] = [];
-        olive.backend.subscribe(world.householdId, (c) => changes.push(c));
+        await listen(olive, world.householdId, (c) => changes.push(c));
         expectOk(await apply({ kind: "removeEntry", entryId: world.entries.milk }));
         await world.settle();
         expect(changes).toEqual([]);
@@ -480,7 +495,7 @@ export function backendContract(name: string, setup: () => Promise<ContractWorld
         const alex = await signedIn(world, "alex");
         if (alex.setOnline === undefined) return;
         const changes: Change[] = [];
-        alex.backend.subscribe(world.householdId, (c) => changes.push(c));
+        await listen(alex, world.householdId, (c) => changes.push(c));
 
         alex.setOnline(false);
         expect(expectErr(await alex.backend.loadHousehold(world.householdId))).toEqual({
@@ -503,8 +518,10 @@ export function backendContract(name: string, setup: () => Promise<ContractWorld
 
         alex.setOnline(true);
         expectOk(await apply({ kind: "deleteItem", itemId: world.items.bananas }));
-        await vi.waitFor(() =>
-          expect(changes).toContainEqual({ kind: "itemDeleted", itemId: world.items.bananas }),
+        await vi.waitFor(
+          () =>
+            expect(changes).toContainEqual({ kind: "itemDeleted", itemId: world.items.bananas }),
+          waitLong,
         );
       });
     });

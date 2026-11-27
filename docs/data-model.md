@@ -22,7 +22,7 @@ erDiagram
 ## Tables
 
 All ids are UUIDs **generated on the client**, so things created offline (a trip, for instance) already have their final id before they reach the server.
-Every table that belongs to a household carries `household_id`, even where it could be derived. That keeps access rules to one check and lets live-update subscriptions filter by household.
+Every table that belongs to a household carries `household_id`, even where it could be derived. That keeps access rules to one check and lets live updates go to one channel per household.
 
 ### `profiles`
 

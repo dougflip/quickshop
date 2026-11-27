@@ -26,8 +26,10 @@ export type BackendPort = {
   loadHousehold(householdId: HouseholdId): Promise<Result<HouseholdSnapshot, BackendError>>;
   apply(householdId: HouseholdId, mutation: Mutation): Promise<Result<ApplyOutcome, BackendError>>;
   /**
-   * Live changes for one household. Nothing is delivered while offline and missed changes are
-   * not replayed, so reload the household after reconnecting.
+   * Live changes for one household. Joining may finish in the background, but every change
+   * committed after a later `loadHousehold` returns is delivered: subscribe, then load, and
+   * nothing falls in between. Nothing is delivered while offline and missed changes are not
+   * replayed, so reload the household after reconnecting.
    */
   subscribe(householdId: HouseholdId, onChange: (change: Change) => void): Unsubscribe;
 };
