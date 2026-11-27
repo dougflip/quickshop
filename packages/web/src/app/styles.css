@@ -497,3 +497,49 @@ textarea.field {
 .inset {
   margin-inline: 20px;
 }
+
+/* ---- 8c: tabs and the catalog ---- */
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--line);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: var(--bg);
+}
+.tabs button {
+  border: 0;
+  background: none;
+  padding: 9px 0 8px;
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.tabs button[aria-current="page"] {
+  color: var(--green);
+}
+.tabs svg {
+  width: 24px;
+  height: 24px;
+}
+.pill {
+  flex: none;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 99px;
+  border: 1.5px solid var(--green);
+  background: none;
+  color: var(--green);
+  font-weight: 700;
+  font-size: 14px;
+}
+.pill[aria-pressed="true"] {
+  background: var(--green);
+  color: var(--on-green);
+}
+.tags {
+  color: var(--muted);
+  font-size: 14px;
+}

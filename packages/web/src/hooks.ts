@@ -17,11 +17,11 @@ export function useEngine(engine: Engine): EngineState {
  */
 export function useCommandFeedback(): {
   error: string | null;
-  run: <T>(result: CommandResult<T>) => boolean;
+  run: (result: CommandResult<unknown>) => boolean;
   clear: () => void;
 } {
   const [error, setError] = useState<string | null>(null);
-  const run = useCallback(<T>(result: CommandResult<T>) => {
+  const run = useCallback((result: CommandResult<unknown>) => {
     setError(result.ok ? null : describeCommandError(result.error));
     return result.ok;
   }, []);

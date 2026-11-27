@@ -1,7 +1,6 @@
-import { describeNotice, type BackendError, type Engine, type ReadyState } from "@quickshop/core";
+import type { BackendError, Engine } from "@quickshop/core";
 import { useEngine } from "../hooks.ts";
-import { plural } from "./format.ts";
-import { ListScreen } from "./ListScreen.tsx";
+import { Home } from "./Home.tsx";
 import { SignIn, type SignInDefaults } from "./SignIn.tsx";
 
 /** The QuickShop app: picks a screen from the engine's state and nothing else. */
@@ -49,18 +48,7 @@ export function App({ engine, signIn }: { engine: Engine; signIn: SignInDefaults
           </div>
         );
       case "ready":
-        return (
-          <>
-            <OfflineBar state={state} />
-            <ListScreen engine={engine} state={state} />
-            {state.notice !== null && (
-              <div className="toast" role="alert">
-                <span>{describeNotice(state.notice)}</span>
-                <button onClick={engine.dismissNotice}>OK</button>
-              </div>
-            )}
-          </>
-        );
+        return <Home engine={engine} state={state} />;
     }
   }
 }
@@ -74,16 +62,4 @@ function loadFailure(error: BackendError): string {
     case "rejected":
       return "Something went wrong on the server.";
   }
-}
-
-function OfflineBar({ state }: { state: ReadyState }) {
-  if (state.online) return null;
-  return (
-    <div className="offline" role="status">
-      Offline ·{" "}
-      {state.pendingCount > 0
-        ? `${plural(state.pendingCount, "change")} waiting to sync`
-        : "shopping still works"}
-    </div>
-  );
 }
