@@ -117,7 +117,7 @@ Known gaps, for M9: the device copy is in memory (a reload loses the offline que
 
 Built to match the mockup, still against the engine only:
 
-- **8a** Sign in + account sheet
+- **8a** Sign in + account sheet ✅. `npm run dev` now opens the real app (in-memory sample household, prefilled as Doug); `npm run dev:supabase` the real app on the hosted project; `?harness` opens the old harness on either. The session user now carries their email. Figtree is bundled (no font CDN), and screens are tested with Testing Library on happy-dom (`src/composition/app.test.tsx`).
 - **8b** List + quick add + create item + notes
 - **8c** Catalog + item editor (categories in order)
 - **8d** Shopping + complete + summary + offline banner

@@ -135,7 +135,11 @@ export function backendContract(name: string, setup: () => Promise<ContractWorld
         const session = expectOk(
           await auth.signIn(world.credentials.alex.email, world.credentials.alex.password),
         );
-        expect(session.user).toEqual({ id: world.users.alex, displayName: "Alex" });
+        expect(session.user).toEqual({
+          id: world.users.alex,
+          displayName: "Alex",
+          email: world.credentials.alex.email,
+        });
         expect(await auth.currentSession()).toEqual(session);
       });
 

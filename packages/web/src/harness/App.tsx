@@ -1,7 +1,7 @@
 import type { Engine, ReadyState } from "@quickshop/core";
 import { useState, type FormEvent } from "react";
 import { CatalogSection } from "./CatalogSection.tsx";
-import { useEngine } from "./hooks.ts";
+import { useEngine } from "../hooks.ts";
 import { ListSection } from "./ListSection.tsx";
 import { ShoppingSection } from "./ShoppingSection.tsx";
 

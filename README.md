@@ -19,7 +19,7 @@ packages/
   adapter-memory/   in-memory backend for tests and the harness
   adapter-supabase/ the real backend: the hosted Supabase project
   scenarios/        headless end-to-end tests: real engines against the in-memory backend
-  web/              React + Vite app; currently the harness, on either backend
+  web/              React + Vite app (src/app), plus the test harness (src/harness)
 supabase/           migrations, access checks, seed (see supabase/README.md)
 docs/               planning, data model, milestones, mockup, v1 reference data
 ```
@@ -30,8 +30,9 @@ Requires Node 26 (see `.nvmrc`).
 
 ```sh
 npm install
-npm run dev           # two-phone harness on the in-memory backend, http://localhost:5173
-npm run dev:supabase  # one-phone harness on the hosted project; open two windows
+npm run dev           # the app on an in-memory sample household, http://localhost:5173
+npm run dev:supabase  # the app on the hosted project
+                      # add ?harness to either URL for the bare-bones test harness
 npm run check         # typecheck (tsc), lint (oxlint), format check (oxfmt), tests, build
 npm run test:watch
 npm run test:live     # the backend contract against the hosted project (needs .env.local)

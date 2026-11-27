@@ -34,7 +34,13 @@
     "consistent-return": "off",
     "typescript/consistent-return": "off",
     "oxc/no-map-spread": "off",
-    "react/react-in-jsx-scope": "off"
+    "react/react-in-jsx-scope": "off",
+    "import/no-unassigned-import": [
+      "error",
+      {
+        "allow": ["**/*.css", "@fontsource-variable/*"]
+      }
+    ]
   },
   "overrides": [
     {

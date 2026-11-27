@@ -4,6 +4,7 @@ import {
   type AuthPort,
   type BackendPort,
   type Clock,
+  type Engine,
   type IdGenerator,
   type LocalStore,
   type NetworkStatus,
@@ -21,13 +22,9 @@ export type DeviceParts = {
   readonly store: LocalStore;
 };
 
-/** Starts the app on a phone: a fresh engine over the phone's connection and storage. */
-export function launch(
-  device: DeviceParts,
-  phone: Omit<Phone, "engine" | "launch">,
-  count: number,
-): Phone {
-  const engine = createEngine({
+/** A fresh engine over one device's connection and storage. */
+export function createAppEngine(device: DeviceParts): Engine {
+  return createEngine({
     auth: device.auth,
     backend: device.backend,
     network: device.network,
@@ -35,6 +32,15 @@ export function launch(
     clock,
     ids,
   });
+}
+
+/** Starts the app on a harness phone. */
+export function launch(
+  device: DeviceParts,
+  phone: Omit<Phone, "engine" | "launch">,
+  count: number,
+): Phone {
+  const engine = createAppEngine(device);
   void engine.start();
   return { ...phone, engine, launch: count };
 }

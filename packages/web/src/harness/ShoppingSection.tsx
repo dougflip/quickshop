@@ -1,5 +1,5 @@
 import { shoppingView, type Engine, type EntryView, type ReadyState } from "@quickshop/core";
-import { useCommandFeedback } from "./hooks.ts";
+import { useCommandFeedback } from "../hooks.ts";
 
 /** Shopping mode: what is left to get, what is in the cart, and completing the trip. */
 export function ShoppingSection({ engine, state }: { engine: Engine; state: ReadyState }) {

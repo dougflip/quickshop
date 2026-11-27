@@ -7,7 +7,7 @@ import {
   type ReadyState,
 } from "@quickshop/core";
 import { useState } from "react";
-import { useCommandFeedback } from "./hooks.ts";
+import { useCommandFeedback } from "../hooks.ts";
 
 /** The catalog: add to or remove from the list, rename, set categories, delete. */
 export function CatalogSection({ engine, state }: { engine: Engine; state: ReadyState }) {

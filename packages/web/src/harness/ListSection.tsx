@@ -8,7 +8,7 @@ import {
   type ReadyState,
 } from "@quickshop/core";
 import { useState, type FormEvent } from "react";
-import { useCommandFeedback } from "./hooks.ts";
+import { useCommandFeedback } from "../hooks.ts";
 
 /** Planning mode: quick-add, the list grouped by category, notes, and starting a trip. */
 export function ListSection({ engine, state }: { engine: Engine; state: ReadyState }) {

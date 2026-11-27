@@ -130,7 +130,9 @@ export function createMemoryServer(seed: MemorySeed): MemoryServer {
         }
         const user = [...users.values()].find((u) => u.email === email && u.password === password);
         if (user === undefined) return Promise.resolve(err({ kind: "invalidCredentials" }));
-        state.session = { user: { id: user.id, displayName: user.displayName } };
+        state.session = {
+          user: { id: user.id, displayName: user.displayName, email: user.email },
+        };
         return Promise.resolve(ok(state.session));
       },
       signOut: () => {

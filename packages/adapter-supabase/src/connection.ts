@@ -119,7 +119,11 @@ export function createSupabaseConnection(options: SupabaseConnectionOptions): Su
       const user = data.session?.user;
       if (user === undefined) return null;
       return {
-        user: { id: asUserId(user.id), displayName: await displayNameFor(user.id, user.email) },
+        user: {
+          id: asUserId(user.id),
+          displayName: await displayNameFor(user.id, user.email),
+          email: user.email ?? "",
+        },
       };
     },
     signIn: async (email, password) => {
@@ -131,7 +135,11 @@ export function createSupabaseConnection(options: SupabaseConnectionOptions): Su
       const { user } = data;
       await options.storage.removeItem(profileKey);
       const session: Session = {
-        user: { id: asUserId(user.id), displayName: await displayNameFor(user.id, user.email) },
+        user: {
+          id: asUserId(user.id),
+          displayName: await displayNameFor(user.id, user.email),
+          email: user.email ?? "",
+        },
       };
       return ok(session);
     },
