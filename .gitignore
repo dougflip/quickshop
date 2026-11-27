@@ -27,3 +27,6 @@ dist-ssr
 .env
 .env.*
 !.env.example
+
+# Local MCP config (project ref, enabled tools)
+.mcp.json
