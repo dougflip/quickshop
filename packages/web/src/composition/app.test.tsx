@@ -1,33 +1,11 @@
 // @vitest-environment happy-dom
 // The real app, rendered against the in-memory backend and driven like a person would.
-import {
-  createMemoryLocalStore,
-  createMemoryServer,
-  createSampleSeed,
-  sample,
-} from "@quickshop/adapter-memory";
-import { cleanup, render, screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { sample } from "@quickshop/adapter-memory";
+import { cleanup, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { App } from "../app/App.tsx";
-import { createAppEngine } from "./launch.ts";
+import { openApp, signIn } from "./app.test-support.tsx";
 
 afterEach(cleanup);
-
-function openApp() {
-  const server = createMemoryServer(createSampleSeed());
-  const connection = server.connect();
-  const engine = createAppEngine({ ...connection, store: createMemoryLocalStore() });
-  void engine.start();
-  render(<App engine={engine} signIn={{ email: "", password: "", hint: "Sample accounts" }} />);
-  return { engine, connection, user: userEvent.setup() };
-}
-
-async function signIn(user: ReturnType<typeof userEvent.setup>, email: string, password: string) {
-  await user.type(await screen.findByLabelText("Email"), email);
-  await user.type(screen.getByLabelText("Password"), password);
-  await user.click(screen.getByRole("button", { name: "Sign in" }));
-}
 
 describe("sign in", () => {
   it("says so when the email and password don't match", async () => {

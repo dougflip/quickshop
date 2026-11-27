@@ -93,6 +93,21 @@ export function describeCommandError(error: CommandError): string {
   }
 }
 
+/** A short message for a change that did not stick, which a UI can show as-is. */
+export function describeNotice(notice: Notice): string {
+  switch (notice.kind) {
+    case "rejected":
+      return `That change was undone. ${describeError(notice.reason)}`;
+    case "failed":
+      switch (notice.error.kind) {
+        case "unavailable":
+          return "Couldn't reach QuickShop, so that change was undone. Try again.";
+        case "unauthorized":
+          return "You've been signed out, so that change was undone. Sign in again.";
+      }
+  }
+}
+
 export type Engine = {
   getState: () => EngineState;
   /** Called after every state change. `getState()` returns a new object only when it changed. */

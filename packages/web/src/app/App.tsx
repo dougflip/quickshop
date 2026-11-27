@@ -1,4 +1,4 @@
-import type { BackendError, Engine, ReadyState } from "@quickshop/core";
+import { describeNotice, type BackendError, type Engine, type ReadyState } from "@quickshop/core";
 import { useEngine } from "../hooks.ts";
 import { plural } from "./format.ts";
 import { ListScreen } from "./ListScreen.tsx";
@@ -53,6 +53,12 @@ export function App({ engine, signIn }: { engine: Engine; signIn: SignInDefaults
           <>
             <OfflineBar state={state} />
             <ListScreen engine={engine} state={state} />
+            {state.notice !== null && (
+              <div className="toast" role="alert">
+                <span>{describeNotice(state.notice)}</span>
+                <button onClick={engine.dismissNotice}>OK</button>
+              </div>
+            )}
           </>
         );
     }
