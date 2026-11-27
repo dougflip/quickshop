@@ -1,11 +1,11 @@
-import { createMemoryLocalStore } from "@quickshop/adapter-memory";
 import { createSupabaseConnection, hostedProject } from "@quickshop/adapter-supabase";
 import type { Phone, World } from "../harness/world.ts";
+import { createBrowserLocalStore } from "./browser-store.ts";
 import { launch } from "./launch.ts";
 
 /**
  * One phone on the hosted Supabase project. Open a second window to be the other person: the
- * session is kept in this tab's sessionStorage, so each window signs in separately.
+ * session and device copy are kept in this tab's sessionStorage, so each window signs in separately.
  */
 export function createSupabaseWorld(): World {
   const listeners = new Set<() => void>();
@@ -14,8 +14,7 @@ export function createSupabaseWorld(): World {
     storage: window.sessionStorage,
     storageKey: "quickshop-harness",
   });
-  // The device copy lasts until the page reloads. A storage that survives reloads comes with M9.
-  const device = { ...connection, store: createMemoryLocalStore() };
+  const device = { ...connection, store: createBrowserLocalStore(window.sessionStorage) };
   let phone: Phone = launch(
     device,
     {

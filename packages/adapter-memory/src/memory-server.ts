@@ -45,6 +45,11 @@ export type MemoryConnection = {
    * Wi-Fi or a dead spot in a store.
    */
   setServerReachable(reachable: boolean): void;
+  /**
+   * Drops live delivery while the device stays online, like a phone waking from sleep. Turning
+   * it back on tells subscribers, as a real backend does when its channel rejoins.
+   */
+  setLive(live: boolean): void;
 };
 
 export type MemoryServer = {
@@ -59,9 +64,16 @@ type Subscriber = {
   readonly householdId: HouseholdId;
   readonly connection: ConnectionState;
   readonly onChange: (change: Change) => void;
+  readonly onReconnect: (() => void) | undefined;
 };
 
-type ConnectionState = { session: Session | null; online: boolean; reachable: boolean };
+type ConnectionState = {
+  session: Session | null;
+  online: boolean;
+  reachable: boolean;
+  /** Live delivery, which can drop while the device stays online. */
+  live: boolean;
+};
 
 /**
  * A backend held in memory that several connections share, so tests and the harness can act as
@@ -88,7 +100,10 @@ export function createMemoryServer(seed: MemorySeed): MemoryServer {
   function publish(householdId: HouseholdId, changes: readonly Change[]) {
     const recipients = [...subscribers].filter(
       (s) =>
-        s.householdId === householdId && s.connection.online && isMember(s.connection, householdId),
+        s.householdId === householdId &&
+        s.connection.online &&
+        s.connection.live &&
+        isMember(s.connection, householdId),
     );
     deliveries = deliveries.then(() => {
       for (const change of changes) {
@@ -105,7 +120,7 @@ export function createMemoryServer(seed: MemorySeed): MemoryServer {
   }
 
   function connect(): MemoryConnection {
-    const state: ConnectionState = { session: null, online: true, reachable: true };
+    const state: ConnectionState = { session: null, online: true, reachable: true, live: true };
     const networkListeners = new Set<(online: boolean) => void>();
 
     /** Every backend call goes through here: network first, then who is asking. */
@@ -173,8 +188,8 @@ export function createMemoryServer(seed: MemorySeed): MemoryServer {
           publish(householdId, result.value.changes);
           return ok(result.value.outcome);
         }),
-      subscribe: (householdId, onChange) => {
-        const subscriber: Subscriber = { householdId, connection: state, onChange };
+      subscribe: (householdId, onChange, onReconnect) => {
+        const subscriber: Subscriber = { householdId, connection: state, onChange, onReconnect };
         subscribers.add(subscriber);
         return () => subscribers.delete(subscriber);
       },
@@ -199,6 +214,12 @@ export function createMemoryServer(seed: MemorySeed): MemoryServer {
       },
       setServerReachable: (reachable) => {
         state.reachable = reachable;
+      },
+      setLive: (live) => {
+        if (state.live === live) return;
+        state.live = live;
+        if (!live) return;
+        for (const s of subscribers) if (s.connection === state) s.onReconnect?.();
       },
     };
   }

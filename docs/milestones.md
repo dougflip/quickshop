@@ -126,7 +126,11 @@ Built to match the mockup, still against the engine only:
 
 ## M9: PWA and deploy
 
-- Web manifest, icons, and a service worker that saves the app files so it opens without a connection (`vite-plugin-pwa`).
-- GitHub Actions builds and deploys to GitHub Pages on every push to `main`.
+- Installable PWA (`vite-plugin-pwa`): manifest, icons generated from `packages/web/public/icon.svg` (`npm run icons -w @quickshop/web`), and a service worker that saves the whole app so it opens with no connection. Updates download in the background and take over on the next launch, never mid-trip.
+- The device copy (household + unsent changes) lives in localStorage, so closing the app offline loses nothing.
+- Opening offline keeps you signed in even after the access token expires (the adapter falls back to the saved session; at most a 3 second wait when the signal is bad).
+- `BackendPort.subscribe` takes an `onReconnect`: when the live channel rejoins after a drop (a phone waking up), the engine reloads to pick up what it missed. Closes the M7 gap.
+- `npm run build` is the production build: the hosted project, base path `/quickshop/`, no sample data or harness in the bundle.
+- CI deploys to GitHub Pages on every push to `main` that passes `check`.
 
 **Done when:** it's installed on both phones and you complete one real shopping trip with it.

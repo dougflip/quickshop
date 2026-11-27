@@ -1,6 +1,6 @@
 # QuickShop
 
-A shared, real-time shopping list for a household, installable as a PWA. You build the list together, then one person shops and checks items off, even with a bad signal in the store.
+A shared, real-time shopping list for a household, installable as a PWA: https://dougflip.github.io/quickshop/ You build the list together, then one person shops and checks items off, even with a bad signal in the store.
 
 The long-term goal is a list that knows which store you're in and orders items by your path through it. See [docs/overview.md](docs/overview.md).
 
@@ -39,3 +39,14 @@ npm run test:live     # the backend contract against the hosted project (needs .
 ```
 
 `check` never touches the hosted project. `test:live` needs `SUPABASE_SERVICE_ROLE_KEY` in `.env.local`; it creates throwaway test accounts and deletes them afterwards.
+
+## Deploying
+
+Every push to `main` that passes `check` is deployed to GitHub Pages by CI (`.github/workflows/ci.yml`). `npm run build` makes the same production build locally; `npm run preview -w @quickshop/web` serves it at http://localhost:4173/quickshop/.
+
+## Installing on a phone
+
+- **iPhone (Safari):** open the site, tap Share, then **Add to Home Screen**.
+- **Android (Chrome):** open the site, tap the menu, then **Install app**.
+
+Once installed it opens without a connection. A new version downloads in the background and is used from the next launch.

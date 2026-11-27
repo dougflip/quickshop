@@ -30,6 +30,14 @@ export type BackendPort = {
    * committed after a later `loadHousehold` returns is delivered: subscribe, then load, and
    * nothing falls in between. Nothing is delivered while offline and missed changes are not
    * replayed, so reload the household after reconnecting.
+   *
+   * Live delivery can also drop and come back on its own, without the device going offline (a
+   * phone waking up, a flaky signal). `onReconnect` is called when it comes back: changes from
+   * the gap were missed, so reload then too.
    */
-  subscribe(householdId: HouseholdId, onChange: (change: Change) => void): Unsubscribe;
+  subscribe(
+    householdId: HouseholdId,
+    onChange: (change: Change) => void,
+    onReconnect?: () => void,
+  ): Unsubscribe;
 };

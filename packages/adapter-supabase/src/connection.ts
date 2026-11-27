@@ -11,7 +11,13 @@ import {
   type Result,
   type Session,
 } from "@quickshop/core";
-import { createClient, type RealtimeChannel, type SupabaseClient } from "@supabase/supabase-js";
+import {
+  createClient,
+  isAuthRetryableFetchError,
+  type REALTIME_SUBSCRIBE_STATES,
+  type RealtimeChannel,
+  type SupabaseClient,
+} from "@supabase/supabase-js";
 import { decodeApplyResult, decodeChange, decodeHouseholds, decodeSnapshot } from "./decode.ts";
 import type { SupabaseProject } from "./project.ts";
 
@@ -30,6 +36,10 @@ export type SupabaseConnectionOptions = {
   readonly storageKey: string;
   /** Refresh the session before it expires. On in the app; tests turn it off. */
   readonly autoRefreshToken?: boolean;
+  /** Replaces the network, for tests. */
+  readonly fetch?: typeof fetch;
+  /** How long to wait for the server when restoring a session. Default 3 seconds. */
+  readonly sessionWaitMs?: number;
 };
 
 /** One device talking to the hosted project. */
@@ -55,6 +65,8 @@ const joinTimeoutMs = 10_000;
 type Topic = {
   readonly channel: RealtimeChannel;
   readonly listeners: Set<(change: Change) => void>;
+  /** Told when the channel joins again after dropping, since changes in the gap were missed. */
+  readonly reconnectListeners: Set<() => void>;
   /** Settles once joining has succeeded or failed. */
   readonly joined: Promise<void>;
 };
@@ -70,8 +82,10 @@ export function createSupabaseConnection(options: SupabaseConnectionOptions): Su
       autoRefreshToken: options.autoRefreshToken ?? true,
       detectSessionInUrl: false,
     },
+    ...(options.fetch === undefined ? {} : { global: { fetch: options.fetch } }),
   });
   const profileKey = `${options.storageKey}-profile`;
+  const sessionWaitMs = options.sessionWaitMs ?? 3000;
   const simulated = { online: true, reachable: true };
   const topics = new Map<HouseholdId, Topic>();
   const network = createNetworkStatus(() => simulated.online);
@@ -113,10 +127,47 @@ export function createSupabaseConnection(options: SupabaseConnectionOptions): Su
     }
   }
 
+  /**
+   * The signed-in user, refreshing an expired session if needed. A refresh that can't reach the
+   * server retries for up to half a minute, so give up waiting after a few seconds.
+   */
+  async function liveOrSavedUser(): Promise<{ id: string; email?: string } | undefined> {
+    const slow = Symbol("slow");
+    const loaded = await Promise.race([
+      client.auth.getSession(),
+      new Promise<typeof slow>((resolve) => setTimeout(() => resolve(slow), sessionWaitMs)),
+    ]);
+    if (loaded === slow) return savedUser();
+    const { data, error } = loaded;
+    if (data.session !== null) return data.session.user;
+    // A refresh that failed for lack of network leaves the session saved; any other failure
+    // (the session was revoked, say) means signed out.
+    return error !== null && isAuthRetryableFetchError(error) ? savedUser() : undefined;
+  }
+
+  /** The user in the session supabase-js saved, if any. */
+  async function savedUser(): Promise<{ id: string; email?: string } | undefined> {
+    const raw = await options.storage.getItem(options.storageKey);
+    if (raw === null) return undefined;
+    try {
+      const saved: unknown = JSON.parse(raw);
+      if (typeof saved !== "object" || saved === null || !("user" in saved)) return undefined;
+      const { user } = saved;
+      if (typeof user !== "object" || user === null || !("id" in user)) return undefined;
+      if (typeof user.id !== "string") return undefined;
+      const email = "email" in user && typeof user.email === "string" ? user.email : undefined;
+      return email === undefined ? { id: user.id } : { id: user.id, email };
+    } catch {
+      return undefined;
+    }
+  }
+
   const auth: AuthPort = {
     currentSession: async () => {
-      const { data } = await client.auth.getSession();
-      const user = data.session?.user;
+      // Opening in a store with no signal must not mean signing in again. Offline, or when the
+      // server is slow to answer, use the user saved on this device; requests still need a
+      // valid token, which supabase-js refreshes once the connection is back.
+      const user = canReach() ? await liveOrSavedUser() : await savedUser();
       if (user === undefined) return null;
       return {
         user: {
@@ -200,11 +251,13 @@ export function createSupabaseConnection(options: SupabaseConnectionOptions): Su
       }
     },
 
-    subscribe: (householdId, onChange) => {
+    subscribe: (householdId, onChange, onReconnect) => {
       const topic = topics.get(householdId) ?? join(householdId);
       topic.listeners.add(onChange);
+      if (onReconnect !== undefined) topic.reconnectListeners.add(onReconnect);
       return () => {
         topic.listeners.delete(onChange);
+        if (onReconnect !== undefined) topic.reconnectListeners.delete(onReconnect);
         if (topic.listeners.size > 0 || topics.get(householdId) !== topic) return;
         topics.delete(householdId);
         void client.removeChannel(topic.channel);
@@ -215,6 +268,7 @@ export function createSupabaseConnection(options: SupabaseConnectionOptions): Su
   /** Joins the household's private channel. Only members are let in (realtime.messages policy). */
   function join(householdId: HouseholdId): Topic {
     const listeners = new Set<(change: Change) => void>();
+    const reconnectListeners = new Set<() => void>();
     const channel = client.channel(`household:${householdId}`, { config: { private: true } });
     channel.on("broadcast", { event: "*" }, (message) => {
       // While "offline", nothing arrives, the same as a real dropped connection.
@@ -228,19 +282,25 @@ export function createSupabaseConnection(options: SupabaseConnectionOptions): Su
       }
       for (const listener of listeners) listener(change);
     });
+    let everJoined = false;
     const joined = new Promise<void>((resolve) => {
       const timer = setTimeout(resolve, joinTimeoutMs);
-      const settle = () => {
+      // Called for the first join and again each time the channel rejoins after a drop
+      // (the socket reconnecting, the phone waking up).
+      const onStatus = (status: `${REALTIME_SUBSCRIBE_STATES}`) => {
         clearTimeout(timer);
         resolve();
+        if (status !== "SUBSCRIBED") return;
+        if (everJoined) for (const listener of reconnectListeners) listener();
+        everJoined = true;
       };
       // The channel's access check uses the signed-in user's token.
       client.realtime
         .setAuth()
-        .then(() => channel.subscribe(settle))
-        .catch(settle);
+        .then(() => channel.subscribe(onStatus))
+        .catch(() => onStatus("CHANNEL_ERROR"));
     });
-    const topic: Topic = { channel, listeners, joined };
+    const topic: Topic = { channel, listeners, reconnectListeners, joined };
     topics.set(householdId, topic);
     return topic;
   }

@@ -213,3 +213,24 @@ describe("refused changes", () => {
     expect(ready(doug).notice).toBeNull();
   });
 });
+
+describe("when live updates drop without going offline", () => {
+  it("catches up on what was missed once they come back", async () => {
+    const { phone, sync } = household();
+    const doug = phone("doug");
+    const alex = phone("alex");
+    await signIn(doug, "doug");
+    await signIn(alex, "alex");
+
+    // Doug's phone sleeps: still online, but its live channel is gone.
+    doug.connection.setLive(false);
+    expect(alex.engine.addToList(sampleItemId("Apples")).ok).toBe(true);
+    await sync(alex, doug);
+    expect(itemNames(ready(doug).data)).not.toContain("Apples");
+
+    // It wakes: the channel rejoins and the engine reloads.
+    doug.connection.setLive(true);
+    await sync(doug);
+    expect(itemNames(ready(doug).data)).toContain("Apples");
+  });
+});

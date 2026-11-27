@@ -7,19 +7,22 @@ import {
 import { createSupabaseConnection, hostedProject } from "@quickshop/adapter-supabase";
 import type { Engine } from "@quickshop/core";
 import type { SignInDefaults } from "../app/SignIn.tsx";
+import { createBrowserLocalStore } from "./browser-store.ts";
 import { createAppEngine } from "./launch.ts";
 
 export type AppDevice = { readonly engine: Engine; readonly signIn: SignInDefaults };
 
-/** The real app on the hosted project. The session is kept in localStorage between launches. */
+/** The real app on the hosted project. The session and the device copy live in localStorage. */
 export function supabaseDevice(): AppDevice {
   const connection = createSupabaseConnection({
     project: hostedProject,
     storage: window.localStorage,
     storageKey: "quickshop",
   });
-  // The device copy lasts until the page reloads. A storage that survives reloads comes with M9.
-  const engine = createAppEngine({ ...connection, store: createMemoryLocalStore() });
+  const engine = createAppEngine({
+    ...connection,
+    store: createBrowserLocalStore(window.localStorage),
+  });
   return {
     engine,
     signIn: {

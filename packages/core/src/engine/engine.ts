@@ -300,16 +300,24 @@ export function createEngine(deps: EngineDeps): Engine {
     target: () => Live | null,
     early: Change[],
   ): Unsubscribe {
-    return backend.subscribe(householdId, (change) => {
-      const l = target();
-      if (l === null) {
-        early.push(change);
-        return;
-      }
-      if (live !== l) return;
-      l.confirmed = applyChange(l.confirmed, change);
-      publish();
-    });
+    return backend.subscribe(
+      householdId,
+      (change) => {
+        const l = target();
+        if (l === null) {
+          early.push(change);
+          return;
+        }
+        if (live !== l) return;
+        l.confirmed = applyChange(l.confirmed, change);
+        publish();
+      },
+      () => {
+        // Live delivery was interrupted, so changes may have been missed: catch up.
+        const l = target();
+        if (l !== null && live === l && network.isOnline()) catchUp(l);
+      },
+    );
   }
 
   function catchUp(l: Live) {
