@@ -1,0 +1,364 @@
+{
+  "note": "Catalog and department order from QuickShop v1. Seed input for M6.",
+  "categories": [
+    "Produce",
+    "Bread",
+    "Chips",
+    "Cheese/Dips",
+    "Deli Meats",
+    "Snacks",
+    "Cereal",
+    "Dressings/Jars",
+    "Home Living",
+    "Tacos",
+    "Pasta",
+    "Indian",
+    "Meats",
+    "Dairy",
+    "Drinks",
+    "Fish",
+    "Frozen"
+  ],
+  "items": [
+    {
+      "name": "Apples",
+      "category": "Produce"
+    },
+    {
+      "name": "Grapes",
+      "category": "Produce"
+    },
+    {
+      "name": "Strawberries",
+      "category": "Produce"
+    },
+    {
+      "name": "Blueberries",
+      "category": "Produce"
+    },
+    {
+      "name": "Lettuce",
+      "category": "Produce"
+    },
+    {
+      "name": "Romaine Hearts",
+      "category": "Produce"
+    },
+    {
+      "name": "Mixed Greens",
+      "category": "Produce"
+    },
+    {
+      "name": "Cucumbers",
+      "category": "Produce"
+    },
+    {
+      "name": "Peppers",
+      "category": "Produce"
+    },
+    {
+      "name": "Carrots",
+      "category": "Produce"
+    },
+    {
+      "name": "Sweet Potatoes",
+      "category": "Produce"
+    },
+    {
+      "name": "Brussel Sprouts",
+      "category": "Produce"
+    },
+    {
+      "name": "Asparagus",
+      "category": "Produce"
+    },
+    {
+      "name": "Cauliflower",
+      "category": "Produce"
+    },
+    {
+      "name": "Green Beans",
+      "category": "Produce"
+    },
+    {
+      "name": "Round Sourdough",
+      "category": "Bread"
+    },
+    {
+      "name": "Hawaiin Rolls",
+      "category": "Bread"
+    },
+    {
+      "name": "Wheat Bread",
+      "category": "Bread"
+    },
+    {
+      "name": "Brioche Hamburger Buns",
+      "category": "Bread"
+    },
+    {
+      "name": "Bagels Plain",
+      "category": "Bread"
+    },
+    {
+      "name": "Bagels Blueberry",
+      "category": "Bread"
+    },
+    {
+      "name": "English Muffins",
+      "category": "Bread"
+    },
+    {
+      "name": "Plain Chips",
+      "category": "Chips"
+    },
+    {
+      "name": "Tortilla Chips",
+      "category": "Chips"
+    },
+    {
+      "name": "Ruffle Chips",
+      "category": "Chips"
+    },
+    {
+      "name": "Pretzel Minis",
+      "category": "Chips"
+    },
+    {
+      "name": "Pretzel Stix",
+      "category": "Chips"
+    },
+    {
+      "name": "Pretzel Chips",
+      "category": "Chips"
+    },
+    {
+      "name": "Apple Sauce",
+      "category": "Chips"
+    },
+    {
+      "name": "Cheddar Block Sharp",
+      "category": "Cheese/Dips"
+    },
+    {
+      "name": "Cheddar Block Mild",
+      "category": "Cheese/Dips"
+    },
+    {
+      "name": "Havarti Block",
+      "category": "Cheese/Dips"
+    },
+    {
+      "name": "Sliced Colby Jack",
+      "category": "Cheese/Dips"
+    },
+    {
+      "name": "Sliced Havarti",
+      "category": "Cheese/Dips"
+    },
+    {
+      "name": "Sliced Cheddar",
+      "category": "Cheese/Dips"
+    },
+    {
+      "name": "Shredded Mozzarella",
+      "category": "Cheese/Dips"
+    },
+    {
+      "name": "Taco/Italian Shredded",
+      "category": "Cheese/Dips"
+    },
+    {
+      "name": "Blue Cheese",
+      "category": "Cheese/Dips"
+    },
+    {
+      "name": "String Cheese",
+      "category": "Cheese/Dips"
+    },
+    {
+      "name": "Ham",
+      "category": "Deli Meats"
+    },
+    {
+      "name": "Turkey",
+      "category": "Deli Meats"
+    },
+    {
+      "name": "Salami",
+      "category": "Deli Meats"
+    },
+    {
+      "name": "Prosciutto",
+      "category": "Deli Meats"
+    },
+    {
+      "name": "Club Crackers",
+      "category": "Snacks"
+    },
+    {
+      "name": "Jimmy Crackers",
+      "category": "Snacks"
+    },
+    {
+      "name": "Cheerios",
+      "category": "Cereal"
+    },
+    {
+      "name": "Pickles",
+      "category": "Dressings/Jars"
+    },
+    {
+      "name": "Zesty Italian Dressing",
+      "category": "Dressings/Jars"
+    },
+    {
+      "name": "Olive Garden Dressing",
+      "category": "Dressings/Jars"
+    },
+    {
+      "name": "Raisins Snack Boxes",
+      "category": "Dressings/Jars"
+    },
+    {
+      "name": "Raisins Big Box",
+      "category": "Dressings/Jars"
+    },
+    {
+      "name": "Paper Towels",
+      "category": "Home Living"
+    },
+    {
+      "name": "Toilet Paper",
+      "category": "Home Living"
+    },
+    {
+      "name": "Shells",
+      "category": "Pasta"
+    },
+    {
+      "name": "Spaghetti",
+      "category": "Pasta"
+    },
+    {
+      "name": "Fettuccine",
+      "category": "Pasta"
+    },
+    {
+      "name": "4 Cheese Sauce",
+      "category": "Pasta"
+    },
+    {
+      "name": "Soft Taco Shells Small",
+      "category": "Tacos"
+    },
+    {
+      "name": "Soft Taco Shells Large",
+      "category": "Tacos"
+    },
+    {
+      "name": "Tikka Masala Sauce",
+      "category": "Indian"
+    },
+    {
+      "name": "Jasmine Rice",
+      "category": "Indian"
+    },
+    {
+      "name": "Basmatti Rice",
+      "category": "Indian"
+    },
+    {
+      "name": "White Rice",
+      "category": "Indian"
+    },
+    {
+      "name": "2% Milk",
+      "category": "Dairy"
+    },
+    {
+      "name": "Greek Yogurt",
+      "category": "Dairy"
+    },
+    {
+      "name": "Salted Butter",
+      "category": "Dairy"
+    },
+    {
+      "name": "Unsalted Butter",
+      "category": "Dairy"
+    },
+    {
+      "name": "Eggs",
+      "category": "Dairy"
+    },
+    {
+      "name": "Cream Cheese",
+      "category": "Dairy"
+    },
+    {
+      "name": "Strawberry Cream Cheese",
+      "category": "Dairy"
+    },
+    {
+      "name": "Whipped Cream Cheese",
+      "category": "Dairy"
+    },
+    {
+      "name": "Orange Juice",
+      "category": "Dairy"
+    },
+    {
+      "name": "Le Croix",
+      "category": "Drinks"
+    },
+    {
+      "name": "Tilapia",
+      "category": "Fish"
+    },
+    {
+      "name": "Salmon",
+      "category": "Fish"
+    },
+    {
+      "name": "Chicken",
+      "category": "Meats"
+    },
+    {
+      "name": "Steak",
+      "category": "Meats"
+    },
+    {
+      "name": "Bacon",
+      "category": "Meats"
+    },
+    {
+      "name": "Sausage Cylinders",
+      "category": "Meats"
+    },
+    {
+      "name": "Chicken Fingers",
+      "category": "Frozen"
+    },
+    {
+      "name": "Waffles",
+      "category": "Frozen"
+    },
+    {
+      "name": "French Toast",
+      "category": "Frozen"
+    },
+    {
+      "name": "Cheese Pizza",
+      "category": "Frozen"
+    },
+    {
+      "name": "Peas",
+      "category": "Frozen"
+    },
+    {
+      "name": "Peas and Corn",
+      "category": "Frozen"
+    }
+  ]
+}

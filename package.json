@@ -1,14 +1,31 @@
 {
   "name": "quickshop",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "workspaces": ["packages/*"],
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "type": "module",
   "scripts": {
-    "start": "npm run dev -w ./packages/quickshop-web",
-    "build": "npm run build -ws && cp -r packages/quickshop-web/dist/* docs/"
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "oxlint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:live": "vitest run --config vitest.live.config.ts",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "check": "npm run typecheck && npm run lint && npm run format:check && npm run test && npm run build",
+    "build": "npm run build --workspaces --if-present",
+    "dev": "npm run dev -w @quickshop/web",
+    "dev:supabase": "npm run dev:supabase -w @quickshop/web"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "devDependencies": {
+    "oxfmt": "^0.80.0",
+    "oxlint": "^1.95.0",
+    "oxlint-tsgolint": "^7.0.2009",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.2"
+  },
+  "engines": {
+    "node": ">=26"
+  }
 }

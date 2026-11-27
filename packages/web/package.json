@@ -1,0 +1,33 @@
+{
+  "name": "@quickshop/web",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:supabase": "VITE_BACKEND=supabase vite",
+    "build": "VITE_BACKEND=supabase vite build",
+    "preview": "vite preview --base /quickshop/",
+    "typecheck": "tsc --noEmit",
+    "icons": "pwa-assets-generator"
+  },
+  "dependencies": {
+    "@fontsource-variable/figtree": "^5.3.0",
+    "@quickshop/adapter-memory": "*",
+    "@quickshop/adapter-supabase": "*",
+    "@quickshop/core": "*",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.13",
+    "@types/react": "^19.3.3",
+    "@types/react-dom": "^19.3.0",
+    "@vite-pwa/assets-generator": "^2.0.0",
+    "@vitejs/plugin-react": "^6.3.0",
+    "happy-dom": "^21.0.4",
+    "vite": "^8.4.0",
+    "vite-plugin-pwa": "^2.0.0",
+    "workbox-window": "^7.4.1"
+  }
+}

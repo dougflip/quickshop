@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- QuickShop: a basket with a check, in produce green. Everything that matters sits inside the
+       central 80% so it survives being cropped to a circle (maskable icons). -->
+  <rect width="512" height="512" fill="#17803d"/>
+  <path d="M176 214 L218 132 M336 214 L294 132" stroke="#ffffff" stroke-width="26" stroke-linecap="round" fill="none"/>
+  <path d="M120 214 H392 L360 384 Q356 400 340 400 H172 Q156 400 152 384 Z" fill="#ffffff"/>
+  <path d="M204 302 L242 340 L312 262" stroke="#17803d" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,13 @@
+{
+  "name": "@quickshop/scenarios",
+  "private": true,
+  "description": "Headless end-to-end scenarios: engines from core driven against the in-memory backend.",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@quickshop/adapter-memory": "*",
+    "@quickshop/core": "*"
+  }
+}
