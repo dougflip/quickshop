@@ -543,3 +543,93 @@ textarea.field {
   color: var(--muted);
   font-size: 14px;
 }
+
+/* ---- 8d: shopping, completing a trip, the summary ---- */
+.progress {
+  height: 8px;
+  margin: 0 20px 4px;
+  background: var(--soft);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.progress i {
+  display: block;
+  height: 100%;
+  background: var(--green);
+  border-radius: 99px;
+  transition: width 0.3s;
+}
+.shoprow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 60px;
+  padding: 10px 0;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: none;
+  text-align: left;
+}
+.ck {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2.5px solid var(--line);
+  display: grid;
+  place-items: center;
+}
+.ck svg {
+  width: 18px;
+  height: 18px;
+}
+.shoprow[aria-pressed="true"] .ck {
+  background: var(--green);
+  border-color: var(--green);
+  color: var(--on-green);
+}
+.shoprow[aria-pressed="true"] .nm {
+  text-decoration: line-through;
+  color: var(--muted);
+  font-weight: 500;
+}
+.shoprow .sn {
+  display: block;
+  color: var(--muted);
+  font-size: 14px;
+}
+.cart h3 {
+  color: var(--green);
+}
+.banner button {
+  flex: none;
+  border: 0;
+  border-radius: 10px;
+  padding: 6px 12px;
+  background: var(--on-green);
+  color: var(--green);
+  font-weight: 700;
+}
+.done-mark {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--on-green);
+  color: var(--green);
+  display: grid;
+  place-items: center;
+}
+.done-mark svg {
+  width: 30px;
+  height: 30px;
+}
+.sec {
+  margin: 24px 0 4px;
+  font-size: 18px;
+}
+.sec + p {
+  margin: 0 0 6px;
+  color: var(--muted);
+  font-size: 14px;
+}

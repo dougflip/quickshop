@@ -23,7 +23,16 @@ type OpenSheet =
   | { readonly kind: "item"; readonly item: NewItem };
 
 /** The shopping list: quick add, the list grouped by category, notes and removing. */
-export function ListScreen({ engine, state }: { engine: Engine; state: ReadyState }) {
+export function ListScreen({
+  engine,
+  state,
+  onShop,
+}: {
+  engine: Engine;
+  state: ReadyState;
+  /** Opens the shopping screen. */
+  onShop: () => void;
+}) {
   const [sheet, setSheet] = useState<OpenSheet | null>(null);
   const feedback = useCommandFeedback();
   const { data, members, household, user, online } = state;
@@ -45,7 +54,7 @@ export function ListScreen({ engine, state }: { engine: Engine; state: ReadyStat
           {initial(user.displayName)}
         </button>
       </header>
-      <TripBanner state={state} nameOf={nameOf} />
+      <TripBanner state={state} nameOf={nameOf} onResume={onShop} />
       <QuickAdd
         engine={engine}
         state={state}
@@ -113,6 +122,19 @@ export function ListScreen({ engine, state }: { engine: Engine; state: ReadyStat
           ))
         )}
       </div>
+      {activeTrip(data.shop) === null && (
+        <div className="dock">
+          <button
+            className="primary"
+            disabled={data.entries.length === 0}
+            onClick={() => {
+              if (feedback.run(engine.startTrip())) onShop();
+            }}
+          >
+            Start shopping
+          </button>
+        </div>
+      )}
       {sheet?.kind === "account" && <AccountSheet engine={engine} state={state} onClose={close} />}
       {sheet?.kind === "item" && (
         <ItemSheet engine={engine} state={state} item={sheet.item} onClose={close} />
@@ -143,16 +165,26 @@ function OpenNote({
 }
 
 /** "Ashley is shopping · 3 of 9 in cart", while a trip is in progress. */
-function TripBanner({ state, nameOf }: { state: ReadyState; nameOf: (userId: string) => string }) {
+function TripBanner({
+  state,
+  nameOf,
+  onResume,
+}: {
+  state: ReadyState;
+  nameOf: (userId: string) => string;
+  onResume: () => void;
+}) {
   const trip = activeTrip(state.data.shop);
   if (trip === null) return null;
   const inCart = state.data.entries.filter((e) => e.status === "in_cart").length;
-  const who = trip.startedBy === state.user.id ? "You are" : `${nameOf(trip.startedBy)} is`;
+  const mine = trip.startedBy === state.user.id;
+  const who = mine ? "You are" : `${nameOf(trip.startedBy)} is`;
   return (
     <div className="banner" role="status">
       <span>
         <b>{who} shopping</b> · {inCart} of {state.data.entries.length} in cart
       </span>
+      <button onClick={onResume}>{mine ? "Resume" : "Follow"}</button>
     </div>
   );
 }

@@ -113,14 +113,14 @@ Known gaps, for M9: the device copy is in memory (a reload loses the offline que
 
 **Done when:** the M2 contract suite passes against the hosted project (26 of 26), and the harness, pointed at Supabase through an env flag, does a real trip between two browser windows.
 
-## M8: Real UI (one screen per step)
+## M8: Real UI (one screen per step) ✅
 
 Built to match the mockup, still against the engine only:
 
 - **8a** Sign in + account sheet ✅. `npm run dev` now opens the real app (in-memory sample household, prefilled as Doug); `npm run dev:supabase` the real app on the hosted project; `?harness` opens the old harness on either. The session user now carries their email. Figtree is bundled (no font CDN), and screens are tested with Testing Library on happy-dom (`src/composition/app.test.tsx`).
 - **8b** List + quick add + create item + notes ✅. Quick add suggests matches (Enter adds an exact match or offers to create it), the new-item sheet picks categories in order, notes and remove on each row, the other person's additions flash briefly, a banner shows who is shopping, and a toast explains a change that didn't stick (`describeNotice` in core). Adding and editing are off while offline. Screen tests: `src/composition/list.test.tsx`.
 - **8c** Catalog + item editor (categories in order) ✅. List/Catalog tabs. The catalog shows each item under every one of its categories (with "Also in …"), searches by name, and has an Add / On list pill per item. The item sheet edits name and ordered categories and deletes on a second tap (warning when the item is on the list). Screen tests: `src/composition/catalog.test.tsx`.
-- **8d** Shopping + complete + summary + offline banner
+- **8d** Shopping + complete + summary + offline banner ✅. "Start shopping" opens the shopping screen: what's left by aisle, an "In cart" section, a progress bar, and "Complete trip" with a confirm sheet that says what stays on the list. The summary shows what was bought and what's still needed. The list's banner offers Resume (your trip) or Follow (theirs), and the shopping screen falls back to the list when the trip ends on the other phone. Works fully offline, with the bar counting changes waiting to sync. Screen tests: `src/composition/shop.test.tsx`.
 
 **Done when:** each screen matches the mockup and works on the in-memory and Supabase adapters.
 
