@@ -124,7 +124,7 @@ Built to match the mockup, still against the engine only:
 
 **Done when:** each screen matches the mockup and works on the in-memory and Supabase adapters.
 
-## M9: PWA and deploy
+## M9: PWA and deploy (shipped, in field testing)
 
 - Installable PWA (`vite-plugin-pwa`): manifest, icons generated from `packages/web/public/icon.svg` (`npm run icons -w @quickshop/web`), and a service worker that saves the whole app so it opens with no connection. Updates download in the background and take over on the next launch, never mid-trip.
 - The device copy (household + unsent changes) lives in localStorage, so closing the app offline loses nothing.
@@ -134,3 +134,12 @@ Built to match the mockup, still against the engine only:
 - CI deploys to GitHub Pages on every push to `main` that passes `check`.
 
 **Done when:** it's installed on both phones and you complete one real shopping trip with it.
+
+**Status (2026-11-27):** live at https://dougflip.github.io/quickshop/ and replacing v1, which nobody uses any more. It's installed on Doug's phone and is being tested from the installed app on real trips, not from local dev servers. M9 gets its ✅ after the first real trip.
+
+### Field testing
+
+- Feedback from each trip turns into small fixes, each on its own branch with a PR to `main`. Merging deploys, so a fix doesn't count as tested until it's been used from the installed app.
+- `main` doesn't have to be finished or fully tested before merging: the installed app is the only user.
+- The installed app picks up a new version on the next launch after a deploy. On iPhone that means swiping the app away and opening it again.
+- When reporting a problem, note roughly when it happened and whether there was signal.

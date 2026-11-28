@@ -2,6 +2,8 @@
 
 A shared, real-time shopping list for a household, installable as a PWA: https://dougflip.github.io/quickshop/ You build the list together, then one person shops and checks items off, even with a bad signal in the store.
 
+**Status:** v2 has replaced v1 and is being tested on real shopping trips from the installed app (see [M9 in the milestones](docs/milestones.md#m9-pwa-and-deploy-shipped-in-field-testing)). Fixes go on a branch with a PR to `main`, and merging deploys.
+
 The long-term goal is a list that knows which store you're in and orders items by your path through it. See [docs/overview.md](docs/overview.md).
 
 ## Docs
@@ -49,4 +51,4 @@ Every push to `main` that passes `check` is deployed to GitHub Pages by CI (`.gi
 - **iPhone (Safari):** open the site, tap Share, then **Add to Home Screen**.
 - **Android (Chrome):** open the site, tap the menu, then **Install app**.
 
-Once installed it opens without a connection. A new version downloads in the background and is used from the next launch.
+Once installed it opens without a connection. A new version downloads in the background and is used from the next launch (on iPhone, swipe the app away and open it again).
